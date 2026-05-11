@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NotasApp · Rmatix</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ═══════════════ PANTALLA DE BIENVENIDA / LOGIN ═══════════════ -->
+    <div class="auth-screen" id="authScreen">
+        <div class="auth-container">
+            <div class="auth-glow"></div>
+            <div class="auth-card">
+                <div class="auth-logo">
+                    <span class="logo-icon">📐</span>
+                    <h1 class="logo-text">NOTAS<span class="logo-highlight">APP</span></h1>
+                    <p class="logo-subtitle">Sistema de Control de Notas</p>
+                </div>
+
+                <div class="auth-tabs">
+                    <button class="auth-tab active" data-tab="login">INICIAR SESIÓN</button>
+                    <button class="auth-tab" data-tab="register">REGISTRARSE</button>
+                </div>
+
+                <form class="auth-form active" id="loginForm" autocomplete="off">
+                    <div class="input-group">
+                        <label>NOMBRE DEL ESTUDIANTE</label>
+                        <input type="text" id="loginNombre" placeholder="Ej: Rayhan Matteo Rojas Garcia" maxlength="50" required>
+                    </div>
+                    <div class="input-group">
+                        <label>CURSO</label>
+                        <select id="loginCurso" required>
+                            <option value="">Selecciona tu curso</option>
+                            <option value="901">901</option>
+                            <option value="902">902</option>
+                            <option value="decimo">DÉCIMO</option>
+                            <option value="once">ONCE</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>NÚMERO DE FILA (1-50)</label>
+                        <input type="number" id="loginFila" min="1" max="50" placeholder="Tu número de fila" required>
+                    </div>
+                    <button type="submit" class="auth-btn">INGRESAR AL SISTEMA</button>
+                    <p class="auth-hint">¿Primera vez? Ve a la pestaña REGISTRARSE</p>
+                </form>
+
+                <form class="auth-form" id="registerForm" autocomplete="off">
+                    <div class="input-group">
+                        <label>NOMBRE COMPLETO</label>
+                        <input type="text" id="regNombre" placeholder="Ej: Rayhan Matteo Rojas Garcia" maxlength="50" required>
+                    </div>
+                    <div class="input-group">
+                        <label>CURSO</label>
+                        <select id="regCurso" required>
+                            <option value="">Selecciona tu curso</option>
+                            <option value="901">901</option>
+                            <option value="902">902</option>
+                            <option value="decimo">DÉCIMO</option>
+                            <option value="once">ONCE</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>NÚMERO DE FILA (1-50)</label>
+                        <input type="number" id="regFila" min="1" max="50" placeholder="Tu número de fila" required>
+                    </div>
+                    <button type="submit" class="auth-btn register-btn">CREAR CUENTA</button>
+                    <p class="auth-hint">¿Ya tienes cuenta? Ve a la pestaña INICIAR SESIÓN</p>
+                </form>
+            </div>
+            <p class="auth-footer-text">Desarrollado por <strong>Rmatix</strong> · Rayhan Matteo Rojas Garcia · 902</p>
+        </div>
+    </div>
+
+    <!-- ═══════════════ DASHBOARD PRINCIPAL ═══════════════ -->
+    <div class="dashboard" id="dashboard">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <span class="logo-icon">📐</span>
+                    <span class="sidebar-brand">NOTAS<span>APP</span></span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle" title="Colapsar menú">☰</button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-view="materias">
+                    <span class="nav-icon">📚</span>
+                    <span class="nav-label">Mis Materias</span>
+                </a>
+                <a href="#" class="nav-item" data-view="resumen">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-label">Resumen</span>
+                </a>
+                <a href="#" class="nav-item" data-view="guia">
+                    <span class="nav-icon">📖</span>
+                    <span class="nav-label">Guía de Uso</span>
+                </a>
+                <a href="#" class="nav-item" data-view="creditos">
+                    <span class="nav-icon">⭐</span>
+                    <span class="nav-label">Créditos</span>
+                </a>
+                <a href="#" class="nav-item" data-view="soporte">
+                    <span class="nav-icon">🐛</span>
+                    <span class="nav-label">Reportar Bug</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info-mini">
+                    <div class="user-avatar" id="userAvatar">👤</div>
+                    <div class="user-details">
+                        <span class="user-name" id="sidebarUserName">Estudiante</span>
+                        <span class="user-curso" id="sidebarUserCurso">902</span>
+                    </div>
+                </div>
+                <button class="logout-btn" id="logoutBtn" title="Cerrar sesión">🚪</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="menu-btn" id="menuBtn">☰</button>
+                    <h2 class="topbar-title" id="topbarTitle">Mis Materias</h2>
+                </div>
+                <div class="topbar-right">
+                    <div class="periodo-selector">
+                        <button class="periodo-btn active" data-periodo="2">PERÍODO 2</button>
+                        <button class="periodo-btn" data-periodo="3">PERÍODO 3</button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="escala-bar">
+                <span class="escala-chip e-def">0 – 1 · DEFICIENTE</span>
+                <span class="escala-chip e-mal">2 – 2.9 · MALO</span>
+                <span class="escala-chip e-ace">3 – 3.9 · ACEPTABLE</span>
+                <span class="escala-chip e-sob">4 – 5 · SOBRESALIENTE</span>
+            </div>
+
+            <div class="view-container">
+                <!-- Vista: Materias -->
+                <div class="view active" id="viewMaterias">
+                    <div class="materias-header">
+                        <h3 class="section-title">MATERIAS</h3>
+                        <button class="add-materia-btn" id="addMateriaBtn">＋ AGREGAR MATERIA</button>
+                    </div>
+                    <div class="cards-grid" id="cardsGrid"></div>
+                    <div class="empty-state hidden" id="emptyMaterias">
+                        <span class="empty-icon">📭</span>
+                        <span class="empty-text">No hay materias aún. ¡Agrega una!</span>
+                    </div>
+                </div>
+
+                <!-- Vista: Resumen -->
+                <div class="view" id="viewResumen">
+                    <div class="resumen-card">
+                        <h3 class="section-title">📊 RESUMEN DEL PERÍODO</h3>
+                        <div class="resumen-grid" id="resumenGrid"></div>
+                        <div class="empty-state hidden" id="emptyResumen">
+                            <span class="empty-icon">📋</span>
+                            <span class="empty-text">Finaliza las notas de tus materias para ver el resumen aquí.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vista: Guía -->
+                <div class="view" id="viewGuia">
+                    <div class="guia-card">
+                        <h3 class="section-title">📖 GUÍA DE USO</h3>
+                        <div class="guia-content">
+                            <div class="guia-step"><span class="guia-num">1</span><div><h4>Regístrate o Inicia Sesión</h4><p>Ingresa tu nombre completo, selecciona tu curso (901, 902, Décimo u Once) y tu número de fila. Tus datos se guardan localmente en el navegador.</p></div></div>
+                            <div class="guia-step"><span class="guia-num">2</span><div><h4>Agrega tus materias</h4><p>Al iniciar sesión, se cargan las materias por defecto de tu curso. Puedes agregar más con el botón <strong>"＋ AGREGAR MATERIA"</strong>.</p></div></div>
+                            <div class="guia-step"><span class="guia-num">3</span><div><h4>Registra tus actividades (60%)</h4><p>En cada materia, agrega actividades con su nota (0-5) y fecha. El sistema calcula automáticamente el promedio base. Puedes sumar <strong>puntos extra</strong> que se acumulan al promedio.</p></div></div>
+                            <div class="guia-step"><span class="guia-num">4</span><div><h4>Calcula la nota de la materia</h4><p>Presiona <strong>"FINALIZAR NOTA MATERIA"</strong> para calcular el aporte del 60% (promedio de actividades + extras).</p></div></div>
+                            <div class="guia-step"><span class="guia-num">5</span><div><h4>Completa las demás notas</h4><p>Ingresa la nota de <strong>Autoevaluación (10%)</strong>, <strong>Trimestral (20%)</strong> y <strong>Lectura Crítica (10%)</strong>.</p></div></div>
+                            <div class="guia-step"><span class="guia-num">6</span><div><h4>Calcula la nota del trimestre</h4><p>Presiona <strong>"NOTA DEL TRIMESTRE"</strong> para obtener la calificación final con su escala (Deficiente, Malo, Aceptable, Sobresaliente).</p></div></div>
+                            <div class="guia-nota"><strong>💡 Nota:</strong> Los datos se guardan automáticamente en tu navegador. Puedes cerrar y volver a abrir sin perder tu progreso. Cada estudiante tiene su propio espacio independiente.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vista: Créditos -->
+                <div class="view" id="viewCreditos">
+                    <div class="creditos-card">
+                        <h3 class="section-title">⭐ CRÉDITOS</h3>
+                        <div class="creditos-content">
+                            <div class="creditos-creator">
+                                <div class="creator-avatar">👨‍💻</div>
+                                <h2>Rmatix</h2>
+                                <p class="creator-name">Rayhan Matteo Rojas Garcia</p>
+                                <p class="creator-curso">Estudiante de 902</p>
+                                <p class="creator-desc">Desarrollador de este sistema de control de notas. Creado con dedicación para facilitar el seguimiento académico de los estudiantes.</p>
+                            </div>
+                            <div class="creditos-license">
+                                <h4>📜 Licencia</h4>
+                                <p>Copyright &copy; 2026 <strong>Rayhan Matteo Rojas Garcia (Rmatix)</strong></p>
+                                <p>Todos los derechos reservados.</p>
+                                <p>Este software y su código fuente están protegidos por leyes de derechos de autor. No se permite la redistribución, modificación o uso comercial sin autorización expresa del autor.</p>
+                                <p>Para uso educativo personal. Si deseas contribuir o reportar errores, visita el repositorio oficial en GitHub.</p>
+                                <div class="github-link"><span>🔗</span><a href="https://github.com/Rmatix/notas-app" target="_blank">github.com/Rmatix/notas-app</a></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vista: Soporte / Reportar Bug -->` <div class="view" id="viewSoporte">
+                    <div class="guia-card">
+                        <h3 class="section-title">🐛 REPORTAR UN PROBLEMA</h3>
+                        <div class="guia-content">
+                            <div class="guia-step">
+                                <span class="guia-num">🔗</span>
+                                <div>
+                                    <h4>Repositorio en GitHub</h4>
+                                    <p>Si encuentras un error, bug o tienes una sugerencia, abre un <strong>issue</strong> en el repositorio oficial:</p>
+                                    <p style="margin-top:6px;">
+                                        <a href="https://github.com/Rmatix/notas-app/issues" target="_blank" style="color:var(--accent); text-decoration:underline;">
+                                            github.com/Rmatix/notas-app/issues
+                                        </a>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="guia-step">
+                                <span class="guia-num">👨‍🏫</span>
+                                <div>
+                                    <h4>Contacta al profesor</h4>
+                                    <p>Si no tienes cuenta de GitHub, también puedes comunicárselo directamente a tu profesor. Él me hará llegar el reporte.</p>
+                                </div>
+                            </div>
+                            <div class="guia-nota">
+                                <strong>💡 Recuerda:</strong> Describe el problema con detalle: qué estabas haciendo, qué esperabas, y qué ocurrió. Así podré solucionarlo rápido.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="modalMateria">
+        <div class="modal">
+            <h2>NUEVA MATERIA</h2>
+            <input type="text" id="modalInput" placeholder="Ej: MATEMATICAS" maxlength="30" />
+            <div class="modal-btns">
+                <button class="modal-btn cancel" id="modalCancel">CANCELAR</button>
+                <button class="modal-btn confirm" id="modalConfirm">AGREGAR</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <script src="js/app.js"></script>
+</body>
+</html>
