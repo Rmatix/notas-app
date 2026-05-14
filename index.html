@@ -4,146 +4,688 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NotasApp · Rmatix</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #080c12;
+            --surface: rgba(13, 19, 28, 0.85);
+            --surface-solid: #0d131c;
+            --surface2: #111820;
+            --card: #131b25;
+            --border: #1a2535;
+            --border-light: #243347;
+            --text: #dde8f5;
+            --text2: #7a96b4;
+            --muted: #4a607a;
+            --accent: #4d8ef0;
+            --accent2: #7c4df0;
+            --green: #2ecc8a;
+            --red: #f06565;
+            --yellow: #f0b429;
+            --orange: #f07832;
+            --radius: 18px;
+            --radius-sm: 10px;
+            --shadow: 0 12px 40px rgba(0,0,0,0.4);
+            --shadow-card: 0 4px 20px rgba(0,0,0,0.3);
+            --transition: all 0.28s cubic-bezier(0.25, 0.8, 0.25, 1);
+            /* Mobile nav height */
+            --nav-h: 64px;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; scroll-behavior:smooth; -webkit-tap-highlight-color:transparent; }
+
+        body {
+            background: var(--bg);
+            background-image:
+                radial-gradient(ellipse at 10% 60%, rgba(77,142,240,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 90% 20%, rgba(124,77,240,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 100%, rgba(46,204,138,0.03) 0%, transparent 50%);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .hidden { display:none!important }
+
+        /* ═══ ANIMACIONES ═══ */
+        @keyframes slideInUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes slideInDown { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        @keyframes float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-8px); } }
+        @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+        @keyframes popIn { 0% { transform:scale(0.85); opacity:0; } 70% { transform:scale(1.04); } 100% { transform:scale(1); opacity:1; } }
+        @keyframes spin { to { transform:rotate(360deg); } }
+
+        /* ═══ AUTH SCREEN ═══ */
+        .auth-screen {
+            display:flex; align-items:center; justify-content:center;
+            min-height:100vh; padding:20px;
+            animation: fadeIn 0.6s ease;
+        }
+        .auth-container { width:100%; max-width:420px; }
+
+        .auth-card {
+            background: var(--surface-solid);
+            border: 1px solid var(--border-light);
+            border-radius: 24px;
+            padding: 36px 28px;
+            box-shadow: 0 0 0 1px rgba(77,142,240,0.08), var(--shadow);
+            position: relative; overflow: hidden;
+            animation: popIn 0.5s cubic-bezier(0.2,0.8,0.2,1);
+        }
+        .auth-card::before {
+            content:''; position:absolute; top:-80px; right:-80px;
+            width:200px; height:200px; border-radius:50%;
+            background: radial-gradient(circle, rgba(77,142,240,0.08), transparent 70%);
+            pointer-events:none;
+        }
+        .auth-card::after {
+            content:''; position:absolute; bottom:-60px; left:-60px;
+            width:160px; height:160px; border-radius:50%;
+            background: radial-gradient(circle, rgba(124,77,240,0.06), transparent 70%);
+            pointer-events:none;
+        }
+
+        .auth-logo { text-align:center; margin-bottom:28px; }
+        .logo-icon { font-size:3rem; display:inline-block; animation:float 5s ease-in-out infinite; }
+        .logo-text { font-family:'Bebas Neue',sans-serif; font-size:2.6rem; letter-spacing:5px; margin-top:6px; }
+        .logo-highlight {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+        }
+        .logo-subtitle { font-family:'Space Mono',monospace; font-size:0.65rem; color:var(--muted); letter-spacing:2.5px; margin-top:4px; text-transform:uppercase; }
+
+        .auth-tabs {
+            display:flex; background:var(--surface2); border:1px solid var(--border);
+            border-radius:10px; padding:3px; margin-bottom:22px; gap:3px;
+        }
+        .auth-tab {
+            flex:1; padding:10px; background:transparent; border:none;
+            color:var(--muted); font-family:'Bebas Neue',sans-serif; font-size:0.9rem;
+            letter-spacing:1.5px; cursor:pointer; border-radius:8px; transition:var(--transition);
+        }
+        .auth-tab.active { background:var(--accent); color:#fff; box-shadow:0 3px 10px rgba(77,142,240,0.35); }
+
+        .auth-form { display:none; flex-direction:column; gap:16px; animation:fadeIn 0.3s ease; }
+        .auth-form.active { display:flex; }
+        .input-group { display:flex; flex-direction:column; gap:5px; }
+        .input-group label { font-family:'Space Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; }
+        .input-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+        input, select {
+            background:var(--surface2); border:1px solid var(--border);
+            color:var(--text); border-radius:10px; padding:13px 14px;
+            font-family:'DM Sans',sans-serif; font-size:0.95rem;
+            outline:none; transition:var(--transition); width:100%;
+        }
+        input:focus, select:focus {
+            border-color:var(--accent);
+            box-shadow:0 0 0 3px rgba(77,142,240,0.12);
+            background: #131e2e;
+        }
+        select {
+            appearance:none;
+            background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a607a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat:no-repeat; background-position:right 14px center; padding-right:36px; cursor:pointer;
+        }
+
+        .auth-btn {
+            padding:14px; border:none; border-radius:10px;
+            font-family:'Bebas Neue',sans-serif; font-size:1.05rem; letter-spacing:2px;
+            cursor:pointer; color:#fff; margin-top:6px; transition:var(--transition);
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            box-shadow: 0 4px 18px rgba(77,142,240,0.3);
+            position:relative; overflow:hidden;
+        }
+        .auth-btn::after {
+            content:''; position:absolute; inset:0;
+            background:linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+            opacity:0; transition:opacity 0.2s;
+        }
+        .auth-btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(77,142,240,0.4); }
+        .auth-btn:hover::after { opacity:1; }
+        .auth-btn:active { transform:scale(0.97); }
+        .auth-btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+        .register-btn { background:linear-gradient(135deg,#0fa86e,var(--green)); box-shadow:0 4px 18px rgba(46,204,138,0.3); }
+        .register-btn:hover { box-shadow:0 8px 24px rgba(46,204,138,0.4); }
+
+        .auth-hint { text-align:center; font-size:0.78rem; color:var(--muted); cursor:pointer; transition:color 0.2s; }
+        .auth-hint:hover { color:var(--accent); }
+        .auth-footer { text-align:center; margin-top:18px; font-size:0.7rem; color:var(--muted); font-family:'Space Mono',monospace; opacity:0.6; }
+        .auth-footer strong { color:var(--accent); }
+
+        /* ═══ DASHBOARD ═══ */
+        .dashboard { display:none; min-height:100vh; animation:fadeIn 0.4s ease; }
+        .dashboard.active { display:flex; }
+
+        /* ═══ SIDEBAR (PC) ═══ */
+        .sidebar {
+            width:256px; background:var(--surface); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+            border-right:1px solid var(--border); height:100vh; position:sticky; top:0;
+            display:flex; flex-direction:column; z-index:100; transition:left 0.3s cubic-bezier(0.2,0.8,0.2,1);
+            flex-shrink:0;
+        }
+        .sidebar-header {
+            display:flex; align-items:center; justify-content:space-between;
+            padding:20px 18px; border-bottom:1px solid rgba(255,255,255,0.04);
+        }
+        .sidebar-logo { font-family:'Bebas Neue',sans-serif; font-size:1.35rem; letter-spacing:2px; display:flex; align-items:center; gap:8px; }
+        .sidebar-logo span { background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .sidebar-close { display:none; background:none; border:none; color:var(--text2); font-size:1.6rem; cursor:pointer; width:32px; height:32px; border-radius:8px; transition:var(--transition); display:none; align-items:center; justify-content:center; }
+        .sidebar-close:hover { background:rgba(240,101,101,0.1); color:var(--red); }
+
+        .sidebar-nav { flex:1; padding:10px; display:flex; flex-direction:column; gap:4px; overflow-y:auto; }
+        .nav-item {
+            display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:10px;
+            color:var(--text2); text-decoration:none; font-family:'Space Mono',monospace; font-size:0.75rem;
+            transition:var(--transition); border:1px solid transparent; letter-spacing:0.5px;
+        }
+        .nav-item:hover { background:rgba(255,255,255,0.03); color:var(--text); transform:translateX(3px); }
+        .nav-item.active {
+            background:linear-gradient(135deg,rgba(77,142,240,0.12),rgba(124,77,240,0.08));
+            color:var(--accent); border-color:rgba(77,142,240,0.2); font-weight:700;
+        }
+        .nav-item .nav-icon { font-size:1rem; width:20px; text-align:center; flex-shrink:0; }
+
+        .sidebar-footer {
+            padding:14px; border-top:1px solid rgba(255,255,255,0.04);
+            display:flex; align-items:center; justify-content:space-between;
+            background:rgba(0,0,0,0.15);
+        }
+        .user-badge { display:flex; align-items:center; gap:10px; flex:1; overflow:hidden; }
+        .user-avatar {
+            width:36px; height:36px; border-radius:10px; flex-shrink:0;
+            background:linear-gradient(135deg,rgba(77,142,240,0.2),rgba(124,77,240,0.2));
+            border:1px solid rgba(77,142,240,0.3);
+            display:flex; align-items:center; justify-content:center;
+            font-size:1rem; font-weight:800; color:var(--accent);
+        }
+        .user-name { font-size:0.85rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .user-curso {
+            font-size:0.65rem; color:var(--accent); font-family:'Space Mono',monospace;
+            background:rgba(77,142,240,0.1); padding:2px 6px; border-radius:4px;
+            display:inline-block; margin-top:1px; letter-spacing:0.5px;
+        }
+        .logout-btn {
+            background:transparent; border:1px solid var(--border); color:var(--muted);
+            border-radius:8px; width:34px; height:34px; cursor:pointer; font-size:1rem;
+            transition:var(--transition); display:flex; align-items:center; justify-content:center; flex-shrink:0;
+        }
+        .logout-btn:hover { color:var(--red); border-color:rgba(240,101,101,0.4); background:rgba(240,101,101,0.08); }
+
+        /* ═══ MAIN CONTENT ═══ */
+        .main-content { flex:1; display:flex; flex-direction:column; min-width:0; }
+
+        .topbar {
+            background:var(--surface); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+            border-bottom:1px solid rgba(255,255,255,0.04); height:60px;
+            display:flex; align-items:center; padding:0 20px; gap:14px;
+            position:sticky; top:0; z-index:50;
+        }
+        .menu-btn { display:none; background:none; border:none; color:var(--text2); font-size:1.4rem; cursor:pointer; padding:4px; border-radius:8px; transition:var(--transition); }
+        .menu-btn:hover { color:var(--accent); background:rgba(77,142,240,0.08); }
+        .topbar-title { font-family:'Bebas Neue',sans-serif; font-size:1.4rem; letter-spacing:2px; flex:1; }
+
+        .periodo-selector { display:flex; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:3px; gap:2px; }
+        .periodo-btn {
+            font-family:'Space Mono',monospace; font-size:0.7rem; padding:7px 14px;
+            border-radius:6px; border:none; background:transparent; color:var(--muted);
+            cursor:pointer; transition:var(--transition); font-weight:700; letter-spacing:0.5px;
+        }
+        .periodo-btn:hover:not(.active) { color:var(--text); }
+        .periodo-btn.active { background:var(--accent); color:#fff; box-shadow:0 2px 8px rgba(77,142,240,0.35); }
+
+        .escala-bar {
+            display:flex; gap:8px; flex-wrap:wrap; padding:10px 20px;
+            background:rgba(0,0,0,0.12); border-bottom:1px solid rgba(255,255,255,0.03);
+        }
+        .escala-chip { font-family:'Space Mono',monospace; font-size:0.6rem; padding:3px 9px; border-radius:5px; font-weight:700; letter-spacing:0.5px; }
+        .e-def { background:rgba(240,101,101,0.08); color:var(--red); border:1px solid rgba(240,101,101,0.25); }
+        .e-mal { background:rgba(240,180,41,0.08); color:var(--yellow); border:1px solid rgba(240,180,41,0.25); }
+        .e-ace { background:rgba(77,142,240,0.08); color:var(--accent); border:1px solid rgba(77,142,240,0.25); }
+        .e-sob { background:rgba(46,204,138,0.08); color:var(--green); border:1px solid rgba(46,204,138,0.25); }
+
+        /* ═══ VIEWS ═══ */
+        .view-container { flex:1; padding:20px; max-width:1400px; margin:0 auto; width:100%; }
+        .view { display:none; animation:fadeIn 0.35s ease; }
+        .view.active { display:block; }
+
+        .materias-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px; }
+        .section-title { font-family:'Bebas Neue',sans-serif; font-size:1.5rem; letter-spacing:2px; display:flex; align-items:center; gap:10px; }
+        .section-title::before { content:''; display:block; width:4px; height:18px; background:linear-gradient(180deg,var(--accent),var(--accent2)); border-radius:2px; }
+
+        .add-materia-btn {
+            background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; border:none;
+            border-radius:10px; padding:10px 18px; font-weight:700; font-size:0.8rem; cursor:pointer;
+            font-family:'Space Mono',monospace; transition:var(--transition);
+            box-shadow:0 4px 14px rgba(77,142,240,0.25); display:flex; align-items:center; gap:7px; letter-spacing:0.5px;
+        }
+        .add-materia-btn:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(77,142,240,0.4); }
+        .add-materia-btn:active { transform:scale(0.96); }
+
+        /* ═══ CARDS ═══ */
+        .cards-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(360px,1fr)); gap:18px; }
+
+        .materia-card {
+            background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+            overflow:hidden; transition:var(--transition);
+            animation:slideInUp 0.45s cubic-bezier(0.2,0.8,0.2,1) both;
+            box-shadow:var(--shadow-card);
+        }
+        .materia-card:hover { transform:translateY(-3px); box-shadow:0 16px 36px rgba(0,0,0,0.45); border-color:var(--border-light); }
+
+        .card-header {
+            display:flex; justify-content:space-between; align-items:center; padding:14px 16px;
+            background:rgba(0,0,0,0.18); border-bottom:1px solid var(--border);
+            position:relative; overflow:hidden;
+        }
+        .card-header::after {
+            content:''; position:absolute; top:0; left:0; right:0; height:2px;
+            background:linear-gradient(90deg, var(--accent), var(--accent2)); opacity:0.5;
+        }
+        .materia-nombre { font-family:'Bebas Neue',sans-serif; font-size:1.25rem; letter-spacing:1.5px; }
+        .btn-icon {
+            background:transparent; border:1px solid transparent; color:var(--muted);
+            border-radius:7px; width:28px; height:28px; cursor:pointer; transition:var(--transition);
+            display:flex; align-items:center; justify-content:center; font-size:0.9rem;
+        }
+        .btn-icon:hover { color:var(--red); background:rgba(240,101,101,0.1); border-color:rgba(240,101,101,0.3); transform:rotate(90deg); }
+
+        .card-body { padding:14px 16px; }
+        .nota-label {
+            font-family:'Space Mono',monospace; font-size:0.65rem; color:var(--text2);
+            display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-weight:700; letter-spacing:0.5px;
+        }
+        .pct-badge { background:rgba(77,142,240,0.1); border:1px solid rgba(77,142,240,0.2); border-radius:4px; padding:2px 6px; font-size:0.6rem; color:var(--accent); }
+
+        .divider { border:none; border-top:1px dashed rgba(255,255,255,0.06); margin:12px 0; }
+
+        table { width:100%; border-collapse:collapse; margin-bottom:10px; }
+        th { font-family:'Space Mono',monospace; font-size:0.6rem; color:var(--muted); text-align:left; padding:5px 6px; border-bottom:1px solid var(--border); letter-spacing:0.5px; }
+        td { font-family:'Space Mono',monospace; font-size:0.72rem; padding:7px 6px; border-bottom:1px solid rgba(26,37,53,0.5); transition:background 0.15s; }
+        tr:hover td { background:rgba(255,255,255,0.015); }
+        .act-del { cursor:pointer; color:var(--muted); text-align:center; border-radius:4px; transition:var(--transition); padding:2px 4px; }
+        .act-del:hover { color:var(--red); background:rgba(240,101,101,0.1); }
+
+        .add-act-form, .add-extra-form, .add-negativo-form { display:grid; gap:7px; margin-top:8px; align-items:center; }
+        .add-act-form { grid-template-columns:1fr 65px 110px 36px; }
+        .add-extra-form, .add-negativo-form { grid-template-columns:1fr 75px 36px; }
+
+        .act-input, .nota-input-sm, .date-input {
+            background:var(--surface-solid); border:1px solid var(--border); color:var(--text);
+            border-radius:7px; padding:8px 10px; font-family:'DM Sans',sans-serif; font-size:0.8rem; transition:var(--transition);
+        }
+        .act-input:focus, .nota-input-sm:focus, .date-input:focus { border-color:var(--accent); box-shadow:0 0 0 2px rgba(77,142,240,0.1); }
+        .nota-input-sm { font-family:'Space Mono',monospace; text-align:center; }
+        .date-input { font-family:'Space Mono',monospace; color:var(--muted); }
+
+        .btn-add-nota, .btn-add-negativo {
+            border:none; border-radius:7px; height:100%; min-height:34px;
+            display:flex; align-items:center; justify-content:center;
+            font-weight:bold; font-size:1.1rem; cursor:pointer; transition:var(--transition);
+        }
+        .btn-add-nota { background:rgba(77,142,240,0.1); color:var(--accent); border:1px solid rgba(77,142,240,0.25); }
+        .btn-add-nota:hover { background:var(--accent); color:#fff; }
+        .btn-add-negativo { background:rgba(240,101,101,0.1); color:var(--red); border:1px solid rgba(240,101,101,0.25); }
+        .btn-add-negativo:hover { background:var(--red); color:#fff; }
+        .btn-add-nota:active, .btn-add-negativo:active { transform:scale(0.9); }
+
+        .prom-display {
+            display:flex; gap:8px; flex-wrap:wrap; font-family:'Space Mono',monospace;
+            font-size:0.7rem; color:var(--text2); margin-top:10px;
+            background:rgba(0,0,0,0.18); padding:8px 10px; border-radius:7px; border:1px solid var(--border); align-items:center;
+        }
+
+        .extra-item, .negativo-item { display:flex; align-items:center; gap:8px; padding:7px 10px; border-radius:7px; border:1px solid; margin-bottom:5px; transition:transform 0.15s; }
+        .extra-item:hover, .negativo-item:hover { transform:translateX(2px); }
+        .extra-item { background:rgba(240,120,50,0.04); border-color:rgba(240,120,50,0.18); }
+        .negativo-item { background:rgba(240,101,101,0.04); border-color:rgba(240,101,101,0.18); }
+        .extra-nombre, .negativo-nombre { flex:1; font-size:0.78rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .extra-pts { color:var(--orange); font-weight:700; font-family:'Space Mono',monospace; font-size:0.78rem; }
+        .negativo-pts { color:var(--red); font-weight:700; font-family:'Space Mono',monospace; font-size:0.78rem; }
+        .extra-del, .negativo-del { cursor:pointer; color:var(--muted); transition:color 0.15s; padding:2px 5px; border-radius:4px; font-size:0.8rem; }
+        .extra-del:hover, .negativo-del:hover { color:var(--red); background:rgba(240,101,101,0.1); }
+
+        .nota-final-grande {
+            display:flex; justify-content:space-between; align-items:center; margin-top:14px;
+            padding:14px; border-radius:10px; animation:fadeIn 0.4s;
+            background:linear-gradient(135deg,rgba(255,255,255,0.02),rgba(255,255,255,0.04));
+            border:1px solid var(--border-light);
+        }
+        .nota-final-grande > span { font-family:'Space Mono',monospace; font-size:0.7rem; color:var(--text2); font-weight:700; letter-spacing:0.5px; }
+        .nota-final-num { font-family:'Bebas Neue',sans-serif; font-size:2.4rem; text-shadow:0 2px 12px rgba(0,0,0,0.5); line-height:1; }
+        .calif-badge { font-family:'Bebas Neue',sans-serif; font-size:0.9rem; padding:4px 10px; border-radius:6px; letter-spacing:1px; }
+        .calif-deficiente { background:rgba(240,101,101,0.12); color:var(--red); border:1px solid rgba(240,101,101,0.25); }
+        .calif-malo { background:rgba(240,180,41,0.12); color:var(--yellow); border:1px solid rgba(240,180,41,0.25); }
+        .calif-aceptable { background:rgba(77,142,240,0.12); color:var(--accent); border:1px solid rgba(77,142,240,0.25); }
+        .calif-sobresaliente { background:rgba(46,204,138,0.12); color:var(--green); border:1px solid rgba(46,204,138,0.25); }
+
+        .card-footer { display:flex; gap:8px; padding:14px 16px; border-top:1px solid var(--border); background:rgba(0,0,0,0.1); }
+        .btn-finalizar { flex:1; padding:11px; border-radius:8px; border:none; font-weight:700; font-size:0.72rem; cursor:pointer; transition:var(--transition); letter-spacing:0.5px; font-family:'Space Mono',monospace; }
+        .btn-calc-promedio { background:transparent; color:var(--accent); border:1px solid rgba(77,142,240,0.3); }
+        .btn-calc-promedio:hover { background:rgba(77,142,240,0.08); border-color:var(--accent); transform:translateY(-1px); }
+        .btn-calc-final { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; box-shadow:0 3px 12px rgba(77,142,240,0.25); }
+        .btn-calc-final:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(77,142,240,0.4); }
+        .btn-finalizar:active { transform:scale(0.96); }
+
+        /* ═══ RESUMEN & EMPTY ═══ */
+        .resumen-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; margin-top:18px; }
+        .resumen-item {
+            background:var(--surface2); border:1px solid var(--border); border-radius:12px;
+            padding:16px; display:flex; flex-direction:column; gap:6px;
+            transition:var(--transition); position:relative; overflow:hidden;
+        }
+        .resumen-item:hover { transform:translateY(-3px); border-color:var(--border-light); box-shadow:var(--shadow-card); }
+        .resumen-item::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:linear-gradient(180deg,var(--accent),var(--accent2)); border-radius:3px 0 0 3px; }
+        .resumen-materia { font-family:'Space Mono',monospace; font-size:0.7rem; color:var(--text2); font-weight:700; letter-spacing:0.5px; }
+        .resumen-nota { font-family:'Bebas Neue',sans-serif; font-size:1.7rem; letter-spacing:1px; line-height:1; }
+
+        .info-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:22px; box-shadow:var(--shadow-card); }
+
+        .empty-state { text-align:center; padding:50px 20px; color:var(--muted); font-family:'Space Mono',monospace; display:flex; flex-direction:column; align-items:center; gap:14px; animation:fadeIn 0.5s; }
+        .empty-icon { font-size:3rem; animation:float 4s ease-in-out infinite; display:inline-block; }
+
+        /* ═══ MODAL & TOAST ═══ */
+        .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(6px); z-index:200; align-items:center; justify-content:center; opacity:0; transition:opacity 0.25s; }
+        .modal-overlay.open { display:flex; opacity:1; }
+        .modal {
+            background:var(--surface-solid); border:1px solid var(--border-light); border-radius:20px;
+            padding:28px; width:90%; max-width:380px;
+            transform:translateY(20px) scale(0.95); transition:all 0.3s cubic-bezier(0.2,0.8,0.2,1);
+            box-shadow:0 24px 48px rgba(0,0,0,0.6);
+        }
+        .modal-overlay.open .modal { transform:translateY(0) scale(1); }
+        .modal h3 { font-family:'Bebas Neue',sans-serif; font-size:1.5rem; letter-spacing:2px; margin-bottom:18px; display:flex; align-items:center; gap:8px; }
+        .modal h3::before { content:'+'; color:var(--accent); }
+        .modal input { width:100%; margin-bottom:20px; padding:13px; font-size:0.95rem; }
+        .modal-btns { display:flex; gap:10px; }
+        .modal-btn { flex:1; padding:12px; border-radius:9px; border:none; font-weight:700; cursor:pointer; transition:var(--transition); font-family:'DM Sans',sans-serif; font-size:0.9rem; }
+        .modal-btn.confirm { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; box-shadow:0 4px 14px rgba(77,142,240,0.3); }
+        .modal-btn.confirm:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(77,142,240,0.4); }
+        .modal-btn.cancel { background:transparent; color:var(--text2); border:1px solid var(--border); }
+        .modal-btn.cancel:hover { background:rgba(255,255,255,0.04); color:var(--text); }
+
+        .toast {
+            position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(120px);
+            background:var(--surface-solid); border:1px solid var(--border-light); color:var(--text);
+            font-family:'Space Mono',monospace; font-size:0.75rem; padding:12px 22px;
+            border-radius:10px; z-index:400; opacity:0;
+            transition:transform 0.4s cubic-bezier(0.2,0.8,0.2,1), opacity 0.4s;
+            box-shadow:0 12px 32px rgba(0,0,0,0.5); display:flex; align-items:center; gap:8px;
+            max-width:90vw; text-align:center;
+        }
+        .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+
+        /* ═══ STEPS / INFO / CREDITS ═══ */
+        .steps-list { display:flex; flex-direction:column; gap:10px; margin:18px 0; }
+        .step-item { display:flex; gap:14px; padding:14px; background:var(--surface2); border:1px solid var(--border); border-radius:10px; transition:transform 0.2s; }
+        .step-item:hover { transform:translateX(3px); border-color:var(--border-light); }
+        .step-num { width:34px; height:34px; border-radius:9px; background:rgba(77,142,240,0.1); border:1px solid rgba(77,142,240,0.25); color:var(--accent); display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:1.2rem; flex-shrink:0; }
+        .step-item h4 { font-size:0.9rem; margin-bottom:3px; color:var(--text); }
+        .step-item p { font-size:0.78rem; color:var(--text2); line-height:1.5; }
+        .step-item a { color:var(--accent); text-decoration:none; }
+        .step-item a:hover { text-decoration:underline; }
+        .info-note { background:rgba(77,142,240,0.04); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; padding:14px; font-size:0.82rem; color:var(--text2); margin-top:14px; display:flex; gap:10px; align-items:flex-start; }
+        .creator-info { text-align:center; padding:28px 20px; background:var(--surface2); border:1px solid var(--border); border-radius:12px; position:relative; overflow:hidden; }
+        .creator-info::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--accent),var(--accent2)); }
+        .creator-avatar { font-size:3rem; margin-bottom:10px; animation:float 4s ease-in-out infinite; display:inline-block; }
+        .creator-info h2 { font-family:'Bebas Neue',sans-serif; font-size:2.4rem; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:3px; }
+        .license-info { background:rgba(0,0,0,0.2); border:1px solid var(--border); border-radius:10px; padding:18px; margin-top:14px; }
+
+        /* ═══ LOADING SPINNER ═══ */
+        .loading-overlay { position:fixed; inset:0; background:var(--bg); z-index:500; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; animation:fadeIn 0.2s; }
+        .loading-overlay.hidden { display:none; }
+        .spinner { width:40px; height:40px; border:3px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; }
+        .loading-text { font-family:'Space Mono',monospace; font-size:0.7rem; color:var(--muted); letter-spacing:2px; }
+
+        /* ══════════════════════════════════════════
+           MOBILE — App nativa con bottom nav
+        ══════════════════════════════════════════ */
+        @media (max-width: 768px) {
+            /* Sidebar se convierte en drawer */
+            .sidebar {
+                position:fixed; left:-100%; top:0; bottom:0; width:80%; max-width:280px;
+                z-index:200; box-shadow:4px 0 24px rgba(0,0,0,0.5);
+            }
+            .sidebar.open { left:0; }
+            .sidebar-close { display:flex !important; }
+            .menu-btn { display:flex; }
+
+            /* Overlay del drawer */
+            .sidebar-overlay {
+                display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6);
+                backdrop-filter:blur(2px); z-index:199;
+            }
+            .sidebar-overlay.active { display:block; }
+
+            /* Dashboard en columna */
+            .dashboard.active { flex-direction:column; }
+            .main-content { padding-bottom:var(--nav-h); }
+
+            /* Topbar más compacto */
+            .topbar { height:54px; padding:0 14px; gap:10px; }
+            .topbar-title { font-size:1.2rem; }
+            .periodo-selector { padding:2px; }
+            .periodo-btn { padding:6px 10px; font-size:0.65rem; }
+
+            /* Escala bar scroll horizontal */
+            .escala-bar { flex-wrap:nowrap; overflow-x:auto; padding:8px 14px; gap:6px; scrollbar-width:none; }
+            .escala-bar::-webkit-scrollbar { display:none; }
+
+            /* Cards fullwidth */
+            .view-container { padding:12px; }
+            .cards-grid { grid-template-columns:1fr; gap:12px; }
+            .materias-header { margin-bottom:14px; }
+
+            /* Card adaptado a mobile */
+            .card-header, .card-body, .card-footer { padding:12px 14px; }
+            .materia-nombre { font-size:1.15rem; }
+
+            /* Formularios apilados */
+            .add-act-form { grid-template-columns:1fr 70px; }
+            .add-act-form .date-input { grid-column:1/-1; }
+            .add-act-form .btn-add-nota { grid-column:2/3; grid-row:1/2; height:100%; }
+            .add-extra-form, .add-negativo-form { grid-template-columns:1fr 70px; }
+
+            /* Bottom nav móvil */
+            .bottom-nav {
+                display:flex; position:fixed; bottom:0; left:0; right:0;
+                height:var(--nav-h); background:var(--surface-solid);
+                border-top:1px solid var(--border); z-index:150;
+                backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+                padding:0 4px; padding-bottom:env(safe-area-inset-bottom);
+            }
+            .bottom-nav-item {
+                flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+                gap:3px; background:none; border:none; color:var(--muted); cursor:pointer;
+                transition:var(--transition); border-radius:10px; padding:6px 4px; position:relative;
+            }
+            .bottom-nav-item .bn-icon { font-size:1.2rem; transition:transform 0.2s; }
+            .bottom-nav-item .bn-label { font-family:'Space Mono',monospace; font-size:0.55rem; letter-spacing:0.5px; font-weight:700; }
+            .bottom-nav-item.active { color:var(--accent); }
+            .bottom-nav-item.active .bn-icon { transform:translateY(-2px); }
+            .bottom-nav-item.active::after {
+                content:''; position:absolute; top:0; left:20%; right:20%;
+                height:2px; background:var(--accent); border-radius:0 0 2px 2px;
+            }
+            .bottom-nav-item:active { transform:scale(0.92); }
+
+            /* Auth en mobile */
+            .auth-card { padding:28px 20px; border-radius:20px; }
+            .logo-text { font-size:2.2rem; }
+
+            /* Toast sobre bottom nav */
+            .toast { bottom:calc(var(--nav-h) + 12px); }
+
+            /* Resumen grid 2 col en mobile */
+            .resumen-grid { grid-template-columns:1fr 1fr; gap:10px; }
+        }
+
+        /* Tablets intermedios */
+        @media (min-width:769px) {
+            .bottom-nav { display:none; }
+            .sidebar-overlay { display:none !important; }
+        }
+
+        /* Desktop grande */
+        @media (min-width: 1200px) {
+            .cards-grid { grid-template-columns:repeat(auto-fill,minmax(400px,1fr)); }
+        }
+    </style>
 </head>
 <body>
 
-    <!-- ═══════════════ PANTALLA DE BIENVENIDA / LOGIN ═══════════════ -->
+    <!-- Loading inicial -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text">CARGANDO...</div>
+    </div>
+
+    <!-- Overlay del sidebar móvil -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <div class="auth-screen" id="authScreen">
         <div class="auth-container">
-            <div class="auth-glow"></div>
             <div class="auth-card">
                 <div class="auth-logo">
-                    <span class="logo-icon">📐</span>
+                    <div class="logo-icon">📐</div>
                     <h1 class="logo-text">NOTAS<span class="logo-highlight">APP</span></h1>
                     <p class="logo-subtitle">Sistema de Control de Notas</p>
                 </div>
-
                 <div class="auth-tabs">
                     <button class="auth-tab active" data-tab="login">INICIAR SESIÓN</button>
                     <button class="auth-tab" data-tab="register">REGISTRARSE</button>
                 </div>
-
                 <form class="auth-form active" id="loginForm" autocomplete="off">
                     <div class="input-group">
-                        <label>NOMBRE DEL ESTUDIANTE</label>
-                        <input type="text" id="loginNombre" placeholder="Ej: Rayhan Matteo Rojas Garcia" maxlength="50" required>
+                        <label>USUARIO</label>
+                        <input type="text" id="loginNombre" placeholder="Tu nombre de usuario" maxlength="60" required>
                     </div>
                     <div class="input-group">
-                        <label>CURSO</label>
-                        <select id="loginCurso" required>
-                            <option value="">Selecciona tu curso</option>
-                            <option value="901">901</option>
-                            <option value="902">902</option>
-                            <option value="decimo">DÉCIMO</option>
-                            <option value="once">ONCE</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label>NÚMERO DE FILA (1-50)</label>
-                        <input type="number" id="loginFila" min="1" max="50" placeholder="Tu número de fila" required>
+                        <label>CONTRASEÑA</label>
+                        <input type="password" id="loginPassword" placeholder="Tu contraseña" required>
                     </div>
                     <button type="submit" class="auth-btn">INGRESAR AL SISTEMA</button>
-                    <p class="auth-hint">¿Primera vez? Ve a la pestaña REGISTRARSE</p>
+                    <p class="auth-hint" onclick="document.querySelector('[data-tab=\'register\']').click()">¿Primera vez? Ve a REGISTRARSE</p>
                 </form>
-
                 <form class="auth-form" id="registerForm" autocomplete="off">
                     <div class="input-group">
-                        <label>NOMBRE COMPLETO</label>
-                        <input type="text" id="regNombre" placeholder="Ej: Rayhan Matteo Rojas Garcia" maxlength="50" required>
-                    </div>
-                    <div class="input-group">
-                        <label>CURSO</label>
-                        <select id="regCurso" required>
-                            <option value="">Selecciona tu curso</option>
-                            <option value="901">901</option>
-                            <option value="902">902</option>
-                            <option value="decimo">DÉCIMO</option>
-                            <option value="once">ONCE</option>
+                        <label>TIPO DE CUENTA</label>
+                        <select id="regTipo" required onchange="toggleRegTipo()">
+                            <option value="">Selecciona...</option>
+                            <option value="estudiante">🎒 Estudiante</option>
+                            <option value="profesor">👨‍🏫 Profesor</option>
+                            <option value="directora">👩‍💼 Directora de Curso</option>
                         </select>
                     </div>
+                    <!-- Campos estudiante -->
+                    <div id="camposEstudiante" style="display:none; display:flex; flex-direction:column; gap:16px;">
+                        <div class="input-group">
+                            <label>NOMBRE DEL ESTUDIANTE</label>
+                            <select id="regNombreEstudiante">
+                                <option value="">Selecciona tu nombre...</option>
+                                <option value="ASCENCIO GALLEGO HEIDY VALENTINA" data-fila="1">1 · ASCENCIO GALLEGO HEIDY VALENTINA</option>
+                                <option value="CHAPARRO VILLEGAS JOHAN SEBASTIAN" data-fila="2">2 · CHAPARRO VILLEGAS JOHAN SEBASTIAN</option>
+                                <option value="COMBARIZA CASTRO DUVAN FELIPE" data-fila="3">3 · COMBARIZA CASTRO DUVAN FELIPE</option>
+                                <option value="DURAN GRANADOS MICHAEL STIV" data-fila="4">4 · DURAN GRANADOS MICHAEL STIV</option>
+                                <option value="GARCIA CASTAÑO JHOJAN SANTIAGO" data-fila="5">5 · GARCIA CASTAÑO JHOJAN SANTIAGO</option>
+                                <option value="GUERRERO ARENAS MARIANA" data-fila="6">6 · GUERRERO ARENAS MARIANA</option>
+                                <option value="MARTIN QUINTERO NICOLLE VALERIA" data-fila="7">7 · MARTIN QUINTERO NICOLLE VALERIA</option>
+                                <option value="MORENO CIFUENTES MICHAEL STICK" data-fila="8">8 · MORENO CIFUENTES MICHAEL STICK</option>
+                                <option value="ORTIZ GONZALEZ SHAYRA VALENTINA" data-fila="9">9 · ORTIZ GONZALEZ SHAYRA VALENTINA</option>
+                                <option value="ALVAREZ CULMA DAVID SANTIAGO" data-fila="10">10 · ALVAREZ CULMA DAVID SANTIAGO</option>
+                                <option value="PEÑARETE CAMACHO ANDRES SANTIAGO" data-fila="11">11 · PEÑARETE CAMACHO ANDRES SANTIAGO</option>
+                                <option value="RAMIREZ GARCIA MICHELLE TATIANA" data-fila="12">12 · RAMIREZ GARCIA MICHELLE TATIANA</option>
+                                <option value="RAMIREZ JIMENEZ JULIAN SANTIAGO" data-fila="13">13 · RAMIREZ JIMENEZ JULIAN SANTIAGO</option>
+                                <option value="RAMIREZ MARTINEZ WENDY DALLANA" data-fila="14">14 · RAMIREZ MARTINEZ WENDY DALLANA</option>
+                                <option value="RODRIGUEZ BOHORQUEZ DEINER ANDREY" data-fila="15">15 · RODRIGUEZ BOHORQUEZ DEINER ANDREY</option>
+                                <option value="ROJAS GARCIA RAYHAN MATTEO" data-fila="16">16 · ROJAS GARCIA RAYHAN MATTEO</option>
+                                <option value="RUIZ SOLORZANO SOFIA ALEXA" data-fila="17">17 · RUIZ SOLORZANO SOFIA ALEXA</option>
+                                <option value="SALAZAR TOCUA MELANY SOFIA" data-fila="18">18 · SALAZAR TOCUA MELANY SOFIA</option>
+                                <option value="VARGAS VARGAS DILAN CAMILO" data-fila="19">19 · VARGAS VARGAS DILAN CAMILO</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- Campos profesor -->
+                    <div id="camposProfesor" style="display:none; flex-direction:column; gap:16px;">
+                        <div class="input-group">
+                            <label>NOMBRE DEL PROFESOR</label>
+                            <input type="text" id="regNombreProfesor" placeholder="Tu nombre completo" maxlength="60">
+                        </div>
+                        <div class="input-group">
+                            <label>MATERIA QUE DICTA</label>
+                            <select id="regMateriaProfesor">
+                                <option value="">Selecciona materia...</option>
+                                <option value="MATEMATICAS">MATEMÁTICAS</option>
+                                <option value="ESPAÑOL">ESPAÑOL</option>
+                                <option value="BIOLOGIA">BIOLOGÍA</option>
+                                <option value="SOCIALES">SOCIALES</option>
+                                <option value="INGLES">INGLÉS</option>
+                                <option value="ED. FISICA">ED. FÍSICA</option>
+                                <option value="TECNOLOGIA">TECNOLOGÍA</option>
+                                <option value="MUSICA">MÚSICA</option>
+                                <option value="CATEDRA">CÁTEDRA</option>
+                            </select>
+                        </div>
+                    </div>
                     <div class="input-group">
-                        <label>NÚMERO DE FILA (1-50)</label>
-                        <input type="number" id="regFila" min="1" max="50" placeholder="Tu número de fila" required>
+                        <label>CONTRASEÑA</label>
+                        <input type="password" id="regPassword" placeholder="Mínimo 6 caracteres" minlength="6" required>
                     </div>
                     <button type="submit" class="auth-btn register-btn">CREAR CUENTA</button>
-                    <p class="auth-hint">¿Ya tienes cuenta? Ve a la pestaña INICIAR SESIÓN</p>
+                    <p class="auth-hint" onclick="document.querySelector('[data-tab=\'login\']').click()">¿Ya tienes cuenta? Ve a INICIAR SESIÓN</p>
                 </form>
             </div>
-            <p class="auth-footer-text">Desarrollado por <strong>Rmatix</strong> · Rayhan Matteo Rojas Garcia · 902</p>
+            <p class="auth-footer">Desarrollado por <strong>Rmatix</strong> · Rayhan Matteo Rojas Garcia · 902</p>
         </div>
     </div>
 
-    <!-- ═══════════════ DASHBOARD PRINCIPAL ═══════════════ -->
     <div class="dashboard" id="dashboard">
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <div class="sidebar-logo">
-                    <span class="logo-icon">📐</span>
-                    <span class="sidebar-brand">NOTAS<span>APP</span></span>
-                </div>
-                <button class="sidebar-toggle" id="sidebarToggle" title="Colapsar menú">☰</button>
+                <div class="sidebar-logo">📐 NOTAS<span>APP</span></div>
+                <button class="sidebar-close" id="sidebarClose">×</button>
             </div>
-            <nav class="sidebar-nav">
-                <a href="#" class="nav-item active" data-view="materias">
-                    <span class="nav-icon">📚</span>
-                    <span class="nav-label">Mis Materias</span>
-                </a>
-                <a href="#" class="nav-item" data-view="resumen">
-                    <span class="nav-icon">📊</span>
-                    <span class="nav-label">Resumen</span>
-                </a>
-                <a href="#" class="nav-item" data-view="guia">
-                    <span class="nav-icon">📖</span>
-                    <span class="nav-label">Guía de Uso</span>
-                </a>
-                <a href="#" class="nav-item" data-view="creditos">
-                    <span class="nav-icon">⭐</span>
-                    <span class="nav-label">Créditos</span>
-                </a>
-                <a href="#" class="nav-item" data-view="soporte">
-                    <span class="nav-icon">🐛</span>
-                    <span class="nav-label">Reportar Bug</span>
-                </a>
+            <nav class="sidebar-nav" id="sidebarNav">
+                <a href="#" class="nav-item active" data-view="materias">📚 Mis Materias</a>
+                <a href="#" class="nav-item" data-view="resumen">📊 Resumen</a>
+                <a href="#" class="nav-item" data-view="guia">📖 Guía de Uso</a>
+                <a href="#" class="nav-item" data-view="creditos">⭐ Créditos</a>
+                <a href="#" class="nav-item" data-view="soporte">🐛 Reportar Bug</a>
+                <!-- Nav profe (oculto por defecto) -->
+                <a href="#" class="nav-item nav-profe hidden" data-view="profe-notas">📝 Poner Notas</a>
+                <a href="#" class="nav-item nav-profe hidden" data-view="lectura-global">📖 Lectura Global</a>
+                <a href="#" class="nav-item nav-profe hidden" data-view="guia-profe">❓ Guía Profe</a>
             </nav>
             <div class="sidebar-footer">
-                <div class="user-info-mini">
+                <div class="user-badge">
                     <div class="user-avatar" id="userAvatar">👤</div>
-                    <div class="user-details">
-                        <span class="user-name" id="sidebarUserName">Estudiante</span>
-                        <span class="user-curso" id="sidebarUserCurso">902</span>
+                    <div style="overflow: hidden;">
+                        <div class="user-name" id="sidebarUserName">Estudiante</div>
+                        <div class="user-curso" id="sidebarUserCurso">902</div>
                     </div>
                 </div>
-                <button class="logout-btn" id="logoutBtn" title="Cerrar sesión">🚪</button>
+                <button class="logout-btn" id="logoutBtn" title="Cerrar Sesión">🚪</button>
             </div>
         </aside>
-
-        <main class="main-content">
+        <div class="main-content">
             <header class="topbar">
-                <div class="topbar-left">
-                    <button class="menu-btn" id="menuBtn">☰</button>
-                    <h2 class="topbar-title" id="topbarTitle">Mis Materias</h2>
-                </div>
-                <div class="topbar-right">
-                    <div class="periodo-selector">
-                        <button class="periodo-btn active" data-periodo="2">PERÍODO 2</button>
-                        <button class="periodo-btn" data-periodo="3">PERÍODO 3</button>
-                    </div>
+                <button class="menu-btn" id="menuBtn">☰</button>
+                <h2 class="topbar-title" id="topbarTitle">Mis Materias</h2>
+                <div class="periodo-selector">
+                    <button class="periodo-btn active" data-periodo="1">PERÍODO 1</button>
+                    <button class="periodo-btn" data-periodo="2">PERÍODO 2</button>
+                    <button class="periodo-btn" data-periodo="3">PERÍODO 3</button>
                 </div>
             </header>
-
             <div class="escala-bar">
-                <span class="escala-chip e-def">0 – 1 · DEFICIENTE</span>
-                <span class="escala-chip e-mal">2 – 2.9 · MALO</span>
-                <span class="escala-chip e-ace">3 – 3.9 · ACEPTABLE</span>
-                <span class="escala-chip e-sob">4 – 5 · SOBRESALIENTE</span>
+                <span class="escala-chip e-def">0–1 DEFICIENTE</span>
+                <span class="escala-chip e-mal">2–2.9 MALO</span>
+                <span class="escala-chip e-ace">3–3.9 ACEPTABLE</span>
+                <span class="escala-chip e-sob">4–5 SOBRESALIENTE</span>
             </div>
-
             <div class="view-container">
-                <!-- Vista: Materias -->
                 <div class="view active" id="viewMaterias">
                     <div class="materias-header">
                         <h3 class="section-title">MATERIAS</h3>
@@ -151,108 +693,1072 @@
                     </div>
                     <div class="cards-grid" id="cardsGrid"></div>
                     <div class="empty-state hidden" id="emptyMaterias">
-                        <span class="empty-icon">📭</span>
-                        <span class="empty-text">No hay materias aún. ¡Agrega una!</span>
+                        <span class="empty-icon">📭</span> 
+                        <div>
+                            <h3 style="color: var(--text); font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 1px;">No hay materias aún</h3>
+                            <p style="font-size: 0.85rem; margin-top: 8px;">¡Haz clic en agregar materia para empezar!</p>
+                        </div>
                     </div>
                 </div>
-
-                <!-- Vista: Resumen -->
                 <div class="view" id="viewResumen">
-                    <div class="resumen-card">
-                        <h3 class="section-title">📊 RESUMEN DEL PERÍODO</h3>
+                    <div class="info-card">
+                        <h3 class="section-title">RESUMEN DEL PERÍODO</h3>
                         <div class="resumen-grid" id="resumenGrid"></div>
                         <div class="empty-state hidden" id="emptyResumen">
                             <span class="empty-icon">📋</span>
-                            <span class="empty-text">Finaliza las notas de tus materias para ver el resumen aquí.</span>
+                            <div>
+                                <h3 style="color: var(--text); font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 1px;">Resumen Vacío</h3>
+                                <p style="font-size: 0.85rem; margin-top: 8px;">Finaliza tus materias para ver el gráfico aquí.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Vista: Guía -->
                 <div class="view" id="viewGuia">
-                    <div class="guia-card">
-                        <h3 class="section-title">📖 GUÍA DE USO</h3>
-                        <div class="guia-content">
-                            <div class="guia-step"><span class="guia-num">1</span><div><h4>Regístrate o Inicia Sesión</h4><p>Ingresa tu nombre completo, selecciona tu curso (901, 902, Décimo u Once) y tu número de fila. Tus datos se guardan localmente en el navegador.</p></div></div>
-                            <div class="guia-step"><span class="guia-num">2</span><div><h4>Agrega tus materias</h4><p>Al iniciar sesión, se cargan las materias por defecto de tu curso. Puedes agregar más con el botón <strong>"＋ AGREGAR MATERIA"</strong>.</p></div></div>
-                            <div class="guia-step"><span class="guia-num">3</span><div><h4>Registra tus actividades (60%)</h4><p>En cada materia, agrega actividades con su nota (0-5) y fecha. El sistema calcula automáticamente el promedio base. Puedes sumar <strong>puntos extra</strong> que se acumulan al promedio.</p></div></div>
-                            <div class="guia-step"><span class="guia-num">4</span><div><h4>Calcula la nota de la materia</h4><p>Presiona <strong>"FINALIZAR NOTA MATERIA"</strong> para calcular el aporte del 60% (promedio de actividades + extras).</p></div></div>
-                            <div class="guia-step"><span class="guia-num">5</span><div><h4>Completa las demás notas</h4><p>Ingresa la nota de <strong>Autoevaluación (10%)</strong>, <strong>Trimestral (20%)</strong> y <strong>Lectura Crítica (10%)</strong>.</p></div></div>
-                            <div class="guia-step"><span class="guia-num">6</span><div><h4>Calcula la nota del trimestre</h4><p>Presiona <strong>"NOTA DEL TRIMESTRE"</strong> para obtener la calificación final con su escala (Deficiente, Malo, Aceptable, Sobresaliente).</p></div></div>
-                            <div class="guia-nota"><strong>💡 Nota:</strong> Los datos se guardan automáticamente en tu navegador. Puedes cerrar y volver a abrir sin perder tu progreso. Cada estudiante tiene su propio espacio independiente.</div>
+                    <div class="info-card">
+                        <h3 class="section-title">GUÍA DE USO</h3>
+                        <div class="steps-list">
+                            <div class="step-item"><span class="step-num">1</span><div><h4>Regístrate o Inicia Sesión</h4><p>Ingresa tu nombre, curso y número de fila.</p></div></div>
+                            <div class="step-item"><span class="step-num">2</span><div><h4>Agrega tus materias</h4><p>Se cargan por defecto. Usa <strong>"＋ AGREGAR MATERIA"</strong> si faltan.</p></div></div>
+                            <div class="step-item"><span class="step-num">3</span><div><h4>Registra actividades (60%)</h4><p>Agrega notas (0-5). Puedes sumar <strong>puntos extra</strong> y restar <strong>negativos</strong>.</p></div></div>
+                            <div class="step-item"><span class="step-num">4</span><div><h4>Finaliza la nota de materia</h4><p>Presiona <strong>"FINALIZAR NOTA MATERIA"</strong>.</p></div></div>
+                            <div class="step-item"><span class="step-num">5</span><div><h4>Completa las demás notas</h4><p>Autoevaluación (10%), Trimestral (20%), Lectura Crítica (10%).</p></div></div>
+                            <div class="step-item"><span class="step-num">6</span><div><h4>Calcula la nota del trimestre</h4><p>Presiona <strong>"NOTA DEL TRIMESTRE"</strong>.</p></div></div>
                         </div>
+                        <div class="info-note"><span>💡</span> Los datos se guardan automáticamente en tu navegador. Cada estudiante tiene su espacio independiente.</div>
                     </div>
                 </div>
-
-                <!-- Vista: Créditos -->
                 <div class="view" id="viewCreditos">
-                    <div class="creditos-card">
-                        <h3 class="section-title">⭐ CRÉDITOS</h3>
-                        <div class="creditos-content">
-                            <div class="creditos-creator">
+                    <div class="info-card">
+                        <h3 class="section-title">CRÉDITOS</h3>
+                        <div class="credits-block" style="margin-top: 20px;">
+                            <div class="creator-info">
                                 <div class="creator-avatar">👨‍💻</div>
                                 <h2>Rmatix</h2>
-                                <p class="creator-name">Rayhan Matteo Rojas Garcia</p>
-                                <p class="creator-curso">Estudiante de 902</p>
-                                <p class="creator-desc">Desarrollador de este sistema de control de notas. Creado con dedicación para facilitar el seguimiento académico de los estudiantes.</p>
+                                <p style="font-size: 1.1rem; font-weight: bold; color: var(--text);">Rayhan Matteo Rojas Garcia</p>
+                                <p style="color:var(--accent);font-family:'Space Mono',monospace; margin-top: 4px; background: rgba(91,156,245,0.1); display: inline-block; padding: 4px 12px; border-radius: 20px;">Estudiante de 902</p>
+                                <p style="color:var(--text2);font-size:0.9rem;margin-top:16px; max-width: 80%; margin-left: auto; margin-right: auto; line-height: 1.6;">Desarrollador principal y diseñador de este sistema integral de control de notas estudiantil.</p>
                             </div>
-                            <div class="creditos-license">
-                                <h4>📜 Licencia</h4>
-                                <p>Copyright &copy; 2026 <strong>Rayhan Matteo Rojas Garcia (Rmatix)</strong></p>
-                                <p>Todos los derechos reservados.</p>
-                                <p>Este software y su código fuente están protegidos por leyes de derechos de autor. No se permite la redistribución, modificación o uso comercial sin autorización expresa del autor.</p>
-                                <p>Para uso educativo personal. Si deseas contribuir o reportar errores, visita el repositorio oficial en GitHub.</p>
-                                <div class="github-link"><span>🔗</span><a href="https://github.com/Rmatix/notas-app" target="_blank">github.com/Rmatix/notas-app</a></div>
+                            <div class="license-info">
+                                <h4 style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--accent); margin-bottom: 8px;">📜 Licencia de Uso</h4>
+                                <p style="color:var(--text2);font-size:0.85rem; margin-bottom: 4px;">Copyright © 2026 <strong>Rayhan Matteo Rojas Garcia (Rmatix)</strong></p>
+                                <p style="color:var(--text2);font-size:0.85rem">Todos los derechos reservados.</p>
+                                <a href="https://github.com/Rmatix/notas-app" target="_blank" class="step-item a" style="display:inline-flex;align-items:center;gap:8px;color:var(--accent);margin-top:12px;text-decoration:none; background: rgba(91,156,245,0.1); padding: 8px 16px; border-radius: 6px;">🔗 Repositorio Oficial en GitHub</a>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Vista: Soporte / Reportar Bug -->` <div class="view" id="viewSoporte">
-                    <div class="guia-card">
-                        <h3 class="section-title">🐛 REPORTAR UN PROBLEMA</h3>
-                        <div class="guia-content">
-                            <div class="guia-step">
-                                <span class="guia-num">🔗</span>
-                                <div>
-                                    <h4>Repositorio en GitHub</h4>
-                                    <p>Si encuentras un error, bug o tienes una sugerencia, abre un <strong>issue</strong> en el repositorio oficial:</p>
-                                    <p style="margin-top:6px;">
-                                        <a href="https://github.com/Rmatix/notas-app/issues" target="_blank" style="color:var(--accent); text-decoration:underline;">
-                                            github.com/Rmatix/notas-app/issues
-                                        </a>
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="guia-step">
-                                <span class="guia-num">👨‍🏫</span>
-                                <div>
-                                    <h4>Contacta al profesor</h4>
-                                    <p>Si no tienes cuenta de GitHub, también puedes comunicárselo directamente a tu profesor. Él me hará llegar el reporte.</p>
-                                </div>
-                            </div>
-                            <div class="guia-nota">
-                                <strong>💡 Recuerda:</strong> Describe el problema con detalle: qué estabas haciendo, qué esperabas, y qué ocurrió. Así podré solucionarlo rápido.
-                            </div>
+                <div class="view" id="viewSoporte">
+                    <div class="info-card">
+                        <h3 class="section-title">REPORTAR UN PROBLEMA</h3>
+                        <div class="steps-list">
+                            <div class="step-item"><span class="step-num" style="background: rgba(139, 92, 246, 0.1); color: var(--accent2); border-color: rgba(139, 92, 246, 0.3);">🔗</span><div><h4>Repositorio en GitHub</h4><p>Abre un <strong>issue</strong> detallado en: <br><a href="https://github.com/Rmatix/notas-app/issues" target="_blank" style="display: inline-block; margin-top: 4px;">github.com/Rmatix/notas-app/issues</a></p></div></div>
+                            <div class="step-item"><span class="step-num" style="background: rgba(52, 211, 153, 0.1); color: var(--green); border-color: rgba(52, 211, 153, 0.3);">👨‍🏫</span><div><h4>Contacta al profesor</h4><p>Si no tienes cuenta de GitHub, infórmale a tu profesor para que escale el reporte.</p></div></div>
                         </div>
+                        <div class="info-note"><span>💡</span> <strong>Tip:</strong> Describe el problema con detalle: qué estabas haciendo, qué esperabas que pasara y qué ocurrió realmente. Adjuntar capturas ayuda mucho.</div>
+                    </div>
+                </div>
+                <!-- Vista profe: poner notas -->
+                <div class="view" id="viewProfeNotas">
+                    <div class="materias-header">
+                        <div class="section-title">📝 NOTAS — <span id="profeMateriaTitulo" style="color:var(--accent)"></span></div>
+                        <div class="periodo-selector">
+                            <button class="periodo-btn active" data-profe-periodo="1">P1</button>
+                            <button class="periodo-btn" data-profe-periodo="2">P2</button>
+                            <button class="periodo-btn" data-profe-periodo="3">P3</button>
+                        </div>
+                    </div>
+
+                    <!-- Selector de estudiante -->
+                    <div class="info-card" style="margin-bottom:16px;">
+                        <div class="input-group">
+                            <label>ESTUDIANTE</label>
+                            <select id="profeEstudianteSelect">
+                                <option value="">Selecciona estudiante...</option>
+                                <option value="ASCENCIO GALLEGO HEIDY VALENTINA">1 · ASCENCIO GALLEGO HEIDY VALENTINA</option>
+                                <option value="CHAPARRO VILLEGAS JOHAN SEBASTIAN">2 · CHAPARRO VILLEGAS JOHAN SEBASTIAN</option>
+                                <option value="COMBARIZA CASTRO DUVAN FELIPE">3 · COMBARIZA CASTRO DUVAN FELIPE</option>
+                                <option value="DURAN GRANADOS MICHAEL STIV">4 · DURAN GRANADOS MICHAEL STIV</option>
+                                <option value="GARCIA CASTAÑO JHOJAN SANTIAGO">5 · GARCIA CASTAÑO JHOJAN SANTIAGO</option>
+                                <option value="GUERRERO ARENAS MARIANA">6 · GUERRERO ARENAS MARIANA</option>
+                                <option value="MARTIN QUINTERO NICOLLE VALERIA">7 · MARTIN QUINTERO NICOLLE VALERIA</option>
+                                <option value="MORENO CIFUENTES MICHAEL STICK">8 · MORENO CIFUENTES MICHAEL STICK</option>
+                                <option value="ORTIZ GONZALEZ SHAYRA VALENTINA">9 · ORTIZ GONZALEZ SHAYRA VALENTINA</option>
+                                <option value="ALVAREZ CULMA DAVID SANTIAGO">10 · ALVAREZ CULMA DAVID SANTIAGO</option>
+                                <option value="PEÑARETE CAMACHO ANDRES SANTIAGO">11 · PEÑARETE CAMACHO ANDRES SANTIAGO</option>
+                                <option value="RAMIREZ GARCIA MICHELLE TATIANA">12 · RAMIREZ GARCIA MICHELLE TATIANA</option>
+                                <option value="RAMIREZ JIMENEZ JULIAN SANTIAGO">13 · RAMIREZ JIMENEZ JULIAN SANTIAGO</option>
+                                <option value="RAMIREZ MARTINEZ WENDY DALLANA">14 · RAMIREZ MARTINEZ WENDY DALLANA</option>
+                                <option value="RODRIGUEZ BOHORQUEZ DEINER ANDREY">15 · RODRIGUEZ BOHORQUEZ DEINER ANDREY</option>
+                                <option value="ROJAS GARCIA RAYHAN MATTEO">16 · ROJAS GARCIA RAYHAN MATTEO</option>
+                                <option value="RUIZ SOLORZANO SOFIA ALEXA">17 · RUIZ SOLORZANO SOFIA ALEXA</option>
+                                <option value="SALAZAR TOCUA MELANY SOFIA">18 · SALAZAR TOCUA MELANY SOFIA</option>
+                                <option value="VARGAS VARGAS DILAN CAMILO">19 · VARGAS VARGAS DILAN CAMILO</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="profeSelectHint" style="text-align:center;padding:40px;color:var(--muted);font-family:'Space Mono',monospace;font-size:0.75rem;">
+                        ☝️ Selecciona un estudiante para ver y poner notas
+                    </div>
+
+                    <div id="profeNotaPanel" class="hidden">
+                        <!-- Notas de materia -->
+                        <div class="info-card" style="margin-bottom:16px;">
+                            <div class="section-title" style="margin-bottom:14px;">📚 NOTAS DE <span id="profeMateriaLabel" style="color:var(--accent)"></span></div>
+                            <p style="font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--muted);margin-bottom:12px;">Registra las actividades, autoevaluación y trimestral de tu materia para este estudiante.</p>
+                            <div id="profeMateriaTabla"></div>
+                            <div class="add-act-form" style="margin-top:10px;">
+                                <input class="act-input" id="profeMateriaActNombre" placeholder="Nombre actividad">
+                                <input class="nota-input-sm" id="profeMateriaActNota" type="number" min="0" max="5" step="0.1" placeholder="Nota">
+                                <input class="date-input" id="profeMateriaActFecha" type="date">
+                                <button class="btn-add-nota" onclick="agregarActividadMateria()">+</button>
+                            </div>
+                            <div id="profeMateriaPromedio" class="prom-display" style="margin-top:10px;"></div>
+                        </div>
+
+                        <!-- Notas de lectura -->
+                        <div class="info-card">
+                            <div class="section-title" style="margin-bottom:14px;">📖 LECTURA CRÍTICA <span style="font-size:0.7rem;color:var(--muted);font-family:'Space Mono',monospace;">(GLOBAL)</span></div>
+                            <p style="font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--muted);margin-bottom:12px;">Estas notas son visibles para todos los profesores. La directora calculará la nota final.</p>
+                            <div id="profeLeTabla"></div>
+                            <div class="add-act-form" style="margin-top:10px;" id="profeLeFormContainer">
+                                <input class="act-input" id="profeLeActNombre" placeholder="Nombre actividad lectura">
+                                <input class="nota-input-sm" id="profeLeActNota" type="number" min="0" max="5" step="0.1" placeholder="Nota">
+                                <input class="date-input" id="profeLeActFecha" type="date">
+                                <button class="btn-add-nota" onclick="agregarActividadLectura()">+</button>
+                            </div>
+                            <div id="profeLePromedio" class="prom-display" style="margin-top:10px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vista tabla global de lectura -->
+                <div class="view" id="viewLecturaGlobal">
+                    <div class="materias-header">
+                        <div class="section-title">📖 TABLA GLOBAL DE LECTURA</div>
+                        <div class="periodo-selector">
+                            <button class="periodo-btn active" data-lectura-periodo="1">P1</button>
+                            <button class="periodo-btn" data-lectura-periodo="2">P2</button>
+                            <button class="periodo-btn" data-lectura-periodo="3">P3</button>
+                        </div>
+                    </div>
+                    <div id="lecturaEstadoBanner" class="info-note" style="display:none;margin-bottom:16px;"></div>
+                    <div id="lecturaGlobalTabla"></div>
+                    <!-- Botón cerrar solo para directora -->
+                    <div id="directoraBtns" class="hidden" style="margin-top:20px;text-align:center;">
+                        <button onclick="cerrarPeriodoLectura()" style="padding:14px 32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:12px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;cursor:pointer;box-shadow:0 4px 18px rgba(77,142,240,0.3);">
+                            ✅ TERMINAR NOTA DE LECTURA
+                        </button>
+                        <p style="font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--muted);margin-top:8px;">Esto calculará el promedio final de lectura para todos los estudiantes.</p>
+                    </div>
+                </div>
+                <!-- Vista guía profesor -->
+                <div class="view" id="viewGuiaProfe">
+                    <div class="info-card">
+                        <h3 class="section-title">📖 GUÍA PARA PROFESORES</h3>
+                        <div class="steps-list">
+                            <div class="step-item"><span class="step-num">1</span><div><h4>Bienvenido, profe</h4><p>Esta plataforma te permite registrar las notas de lectura crítica y la nota final de tu materia para cada estudiante del curso 902.</p></div></div>
+                            <div class="step-item"><span class="step-num">2</span><div><h4>Ir a "Poner Notas"</h4><p>Selecciona el período, luego elige el estudiante de la lista desplegable.</p></div></div>
+                            <div class="step-item"><span class="step-num">3</span><div><h4>Nota de Lectura Crítica</h4><p>Ingresa la nota de lectura crítica (0.0 a 5.0) que corresponde al 10% de la nota final del estudiante.</p></div></div>
+                            <div class="step-item"><span class="step-num">4</span><div><h4>Nota de tu materia</h4><p>También puedes registrar la nota final de tu materia para el estudiante seleccionado.</p></div></div>
+                            <div class="step-item"><span class="step-num">5</span><div><h4>Los estudiantes la ven</h4><p>Una vez guardes la nota, el estudiante podrá verla reflejada en su perfil automáticamente.</p></div></div>
+                        </div>
+                        <div class="info-note"><span>💡</span> Las notas se guardan en la base de datos del servidor y son visibles para el estudiante en tiempo real.</div>
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
+        <nav class="bottom-nav hidden" id="bottomNav">
+            <button class="bottom-nav-item active" data-view="materias">
+                <span class="bn-icon">📚</span><span class="bn-label">MATERIAS</span>
+            </button>
+            <button class="bottom-nav-item" data-view="resumen">
+                <span class="bn-icon">📊</span><span class="bn-label">RESUMEN</span>
+            </button>
+            <button class="bottom-nav-item" data-view="guia">
+                <span class="bn-icon">📖</span><span class="bn-label">GUÍA</span>
+            </button>
+            <button class="bottom-nav-item" data-view="creditos">
+                <span class="bn-icon">⭐</span><span class="bn-label">CRÉDITOS</span>
+            </button>
+        </nav>
     </div>
 
     <div class="modal-overlay" id="modalMateria">
         <div class="modal">
-            <h2>NUEVA MATERIA</h2>
-            <input type="text" id="modalInput" placeholder="Ej: MATEMATICAS" maxlength="30" />
+            <h3>NUEVA MATERIA</h3>
+            <input type="text" id="modalInput" placeholder="Ej: MATEMATICAS" maxlength="30">
             <div class="modal-btns">
                 <button class="modal-btn cancel" id="modalCancel">CANCELAR</button>
                 <button class="modal-btn confirm" id="modalConfirm">AGREGAR</button>
             </div>
         </div>
     </div>
-
+    
     <div class="toast" id="toast"></div>
-    <script src="js/app.js"></script>
+
+    <script>
+        // ═══════════════ NOTASAPP JS (Lógica Original + Animaciones) ═══════════════
+        const API = 'https://backend-notasapp-production.up.railway.app';
+        const MATERIAS_POR_CURSO = {
+            '901': ['MATEMATICAS','ESPAÑOL','BIOLOGIA','SOCIALES','INGLES','ED. FISICA','TECNOLOGIA','MUSICA','CATEDRA'],
+            '902': ['MATEMATICAS','ESPAÑOL','BIOLOGIA','SOCIALES','INGLES','ED. FISICA','TECNOLOGIA','MUSICA','CATEDRA'],
+            'decimo': ['MATEMATICAS','ESPAÑOL','BIOLOGIA','FISICA','QUIMICA','SOCIALES','INGLES','ED. FISICA','TECNOLOGIA','FILOSOFIA','MUSICA','CATEDRA','C. ECONOMICA','C. POLITICA','TRIGONOMETRIA','CALCULO','ESTADISTICA'],
+            'once': ['MATEMATICAS','ESPAÑOL','BIOLOGIA','FISICA','QUIMICA','SOCIALES','INGLES','ED. FISICA','TECNOLOGIA','FILOSOFIA','MUSICA','CATEDRA','C. ECONOMICA','C. POLITICA','CALCULO','ESTADISTICA','PRE-ICFES']
+        };
+        let currentUser = null;
+        let periodoActual = 1;
+        let datosApp = {};
+        let currentView = 'materias';
+
+        let authScreen, dashboard, cardsGrid, resumenGrid, emptyMaterias, emptyResumen, toast, sidebar;
+
+        function init() {
+            authScreen = document.getElementById('authScreen');
+            dashboard = document.getElementById('dashboard');
+            cardsGrid = document.getElementById('cardsGrid');
+            resumenGrid = document.getElementById('resumenGrid');
+            emptyMaterias = document.getElementById('emptyMaterias');
+            emptyResumen = document.getElementById('emptyResumen');
+            toast = document.getElementById('toast');
+            sidebar = document.getElementById('sidebar');
+
+            cargarDatos();
+            
+            document.querySelectorAll('.auth-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    const loginForm = document.getElementById('loginForm');
+                    const registerForm = document.getElementById('registerForm');
+                    
+                    if(tab.dataset.tab === 'login') {
+                        registerForm.classList.remove('active');
+                        setTimeout(() => loginForm.classList.add('active'), 50);
+                    } else {
+                        loginForm.classList.remove('active');
+                        setTimeout(() => registerForm.classList.add('active'), 50);
+                    }
+                });
+            });
+            
+            const el = id => document.getElementById(id);
+
+            el('loginForm').addEventListener('submit', handleLogin);
+            el('registerForm').addEventListener('submit', handleRegister);
+            if(el('logoutBtn')) el('logoutBtn').addEventListener('click', logout);
+            if(el('menuBtn')) el('menuBtn').addEventListener('click', () => {
+                sidebar.classList.add('open');
+                el('sidebarOverlay').classList.add('active');
+            });
+            if(el('sidebarClose')) el('sidebarClose').addEventListener('click', () => {
+                sidebar.classList.remove('open');
+                el('sidebarOverlay').classList.remove('active');
+            });
+            if(el('addMateriaBtn')) el('addMateriaBtn').addEventListener('click', abrirModal);
+            if(el('modalCancel')) el('modalCancel').addEventListener('click', cerrarModal);
+            if(el('modalConfirm')) el('modalConfirm').addEventListener('click', agregarMateria);
+            if(el('modalMateria')) el('modalMateria').addEventListener('click', e => { if(e.target === e.currentTarget) cerrarModal(); });
+            if(el('modalInput')) el('modalInput').addEventListener('keydown', e => {
+                if(e.key === 'Enter') agregarMateria();
+                if(e.key === 'Escape') cerrarModal();
+            });
+
+            document.querySelectorAll('.periodo-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    periodoActual = parseInt(btn.dataset.periodo);
+                    document.querySelectorAll('.periodo-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    cardsGrid.style.opacity = '0';
+                    cargarMateriasPeriodo(periodoActual).then(() => {
+                        render();
+                        cardsGrid.style.opacity = '1';
+                    });
+                });
+            });
+            
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', e => {
+                    e.preventDefault();
+                    cambiarVista(item.dataset.view);
+                });
+            });
+            
+            const savedSession = localStorage.getItem('notasapp_session');
+            const savedToken = localStorage.getItem('notasapp_token');
+            if(savedSession && savedToken) {
+                currentUser = JSON.parse(savedSession);
+                if(currentUser.tipo === 'profesor' || currentUser.tipo === 'directora') {
+                    mostrarDashboardProfe();
+                } else {
+                    cargarMateriasPeriodo(1).then(() => cargarMateriasPeriodo(2)).then(() => cargarMateriasPeriodo(3)).then(() => mostrarDashboard());
+                }
+            } else {
+                document.getElementById('loadingOverlay').classList.add('hidden');
+            }
+        }
+
+        function toggleRegTipo() {
+            const tipo = document.getElementById('regTipo').value;
+            const est = document.getElementById('camposEstudiante');
+            const prof = document.getElementById('camposProfesor');
+            est.style.display = tipo === 'estudiante' ? 'flex' : 'none';
+            prof.style.display = tipo === 'profesor' ? 'flex' : 'none';
+        }
+
+        function cargarDatos() {
+            datosApp = {};
+        }
+
+        async function guardarDatos() {
+            if(!currentUser) return;
+            const token = localStorage.getItem('notasapp_token');
+            const key = getKey();
+            const materias1 = datosApp[key]?.['1']?.materias || [];
+            const materias2 = datosApp[key]?.['2']?.materias || [];
+            const materias3 = datosApp[key]?.['3']?.materias || [];
+            await Promise.all([
+                fetch(`${API}/materias/save`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'authorization': token },
+                    body: JSON.stringify({ periodo: 1, materiasArray: materias1 })
+                }),
+                fetch(`${API}/materias/save`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'authorization': token },
+                    body: JSON.stringify({ periodo: 2, materiasArray: materias2 })
+                }),
+                fetch(`${API}/materias/save`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'authorization': token },
+                    body: JSON.stringify({ periodo: 3, materiasArray: materias3 })
+                })
+            ]);
+        }
+
+        function getKey() { return currentUser ? `${currentUser.nombre.trim().toUpperCase()}::${currentUser.curso}::${currentUser.fila}` : null; }
+
+        async function cargarMateriasPeriodo(periodo) {
+            const token = localStorage.getItem('notasapp_token');
+            const key = getKey();
+            try {
+                const resp = await fetch(`${API}/materias/${periodo}`, {
+                    headers: { 'authorization': token }
+                });
+                if(!resp.ok) return;
+                const materias = await resp.json();
+                if(!datosApp[key]) datosApp[key] = { '1': { materias: [] }, '2': { materias: [] }, '3': { materias: [] } };
+                if(materias.length > 0) {
+                    datosApp[key][String(periodo)].materias = materias.map(m => {
+                        if(!Array.isArray(m.puntosNegativos)) m.puntosNegativos = [];
+                        return m;
+                    });
+                } else {
+                    // Primera vez: inicializar con materias del curso
+                    const cursoMaterias = MATERIAS_POR_CURSO[currentUser.curso] || MATERIAS_POR_CURSO['902'];
+                    datosApp[key][String(periodo)].materias = cursoMaterias.map(nombre => crearMateria(nombre));
+                    await guardarDatos();
+                }
+            } catch(e) {
+                console.error('Error cargando materias:', e);
+            }
+        }
+
+        function getMaterias() {
+            const key = getKey();
+            if(!key) return [];
+            if(!datosApp[key]) datosApp[key] = { '1': { materias: [] }, '2': { materias: [] }, '3': { materias: [] } };
+            return datosApp[key][String(periodoActual)].materias;
+        }
+
+        function crearMateria(nombre) {
+            return {
+                id: Date.now() + Math.random(),
+                nombre: nombre.toUpperCase(),
+                actividades: [],
+                puntosExtra: [],
+                puntosNegativos: [],
+                autoevaluacion: null,
+                trimestral: null,
+                lectura: null,
+                promedioFinal: null,
+                notaFinal: null,
+                calificacion: null
+            };
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('loginNombre').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            if(!nombre || !password) { showToast('⚠ Completa todos los campos'); return; }
+
+            const btn = e.target.querySelector('button[type=submit]');
+            btn.textContent = 'CARGANDO...'; btn.disabled = true;
+
+            try {
+                const resp = await fetch(`${API}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nombre, password })
+                });
+                const data = await resp.json();
+                if(!resp.ok) { showToast('⚠ ' + (data.error || 'Error al ingresar')); return; }
+                localStorage.setItem('notasapp_token', data.token);
+                localStorage.setItem('notasapp_session', JSON.stringify(data.user));
+                currentUser = data.user;
+                if(currentUser.tipo === 'profesor') {
+                    mostrarDashboardProfe();
+                } else {
+                    await cargarMateriasPeriodo(1);
+                    await cargarMateriasPeriodo(2);
+                    await cargarMateriasPeriodo(3);
+                    mostrarDashboard();
+                }
+            } catch(err) {
+                showToast('⚠ Error de conexión con el servidor');
+            } finally {
+                btn.textContent = 'INGRESAR AL SISTEMA'; btn.disabled = false;
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const tipo = document.getElementById('regTipo').value;
+            const password = document.getElementById('regPassword').value;
+            if(!tipo) { showToast('⚠ Selecciona el tipo de cuenta'); return; }
+            if(password.length < 6) { showToast('⚠ La contraseña debe tener mínimo 6 caracteres'); return; }
+
+            let nombre, curso, fila, materia;
+            if(tipo === 'estudiante') {
+                const sel = document.getElementById('regNombreEstudiante');
+                nombre = sel.value;
+                fila = sel.options[sel.selectedIndex]?.dataset.fila || 0;
+                curso = '902';
+                if(!nombre) { showToast('⚠ Selecciona tu nombre'); return; }
+            } else {
+                nombre = document.getElementById('regNombreProfesor').value.trim();
+                materia = document.getElementById('regMateriaProfesor').value;
+                curso = 'PROFE';
+                fila = 0;
+                if(!nombre) { showToast('⚠ Ingresa tu nombre'); return; }
+                if(!materia) { showToast('⚠ Selecciona tu materia'); return; }
+            }
+
+            const btn = e.target.querySelector('button[type=submit]');
+            btn.textContent = 'CREANDO...'; btn.disabled = true;
+
+            try {
+                const resp = await fetch(`${API}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nombre, password, curso, fila, tipo, materia: materia || null })
+                });
+                const data = await resp.json();
+                if(!resp.ok) { showToast('⚠ ' + (data.error || 'Error al registrar')); return; }
+                showToast('✨ Cuenta creada. Ahora inicia sesión.');
+                document.querySelector('[data-tab="login"]').click();
+            } catch(err) {
+                showToast('⚠ Error de conexión con el servidor');
+            } finally {
+                btn.textContent = 'CREAR CUENTA'; btn.disabled = false;
+            }
+        }
+
+        function logout() {
+            if(confirm('¿Seguro que deseas cerrar sesión?')) {
+                currentUser = null;
+                datosApp = {};
+                localStorage.removeItem('notasapp_session');
+                localStorage.removeItem('notasapp_token');
+                document.getElementById('sidebarOverlay').classList.remove('active');
+                document.getElementById('bottomNav').classList.add('hidden');
+                
+                authScreen.style.animation = 'none';
+                authScreen.offsetHeight; /* trigger reflow */
+                authScreen.style.animation = null;
+                
+                authScreen.classList.remove('hidden');
+                dashboard.classList.remove('active');
+                
+                document.getElementById('loginForm').reset();
+                document.getElementById('registerForm').reset();
+            }
+        }
+
+        function mostrarDashboard() {
+            authScreen.classList.add('hidden');
+            dashboard.classList.add('active');
+            document.getElementById('loadingOverlay').classList.add('hidden');
+            document.getElementById('bottomNav').classList.remove('hidden');
+
+            const primerNombre = currentUser.nombre.split(' ')[0];
+            document.getElementById('sidebarUserName').textContent = primerNombre;
+            document.getElementById('sidebarUserCurso').textContent = '902';
+            document.getElementById('userAvatar').textContent = primerNombre.charAt(0).toUpperCase();
+
+            // Nav estudiante
+            document.querySelectorAll('.nav-profe').forEach(n => n.classList.add('hidden'));
+            cambiarVista('materias');
+            render();
+        }
+
+        function mostrarDashboardProfe() {
+            authScreen.classList.add('hidden');
+            dashboard.classList.add('active');
+            document.getElementById('loadingOverlay').classList.add('hidden');
+            document.getElementById('bottomNav').classList.remove('hidden');
+
+            const primerNombre = currentUser.nombre.split(' ')[0];
+            document.getElementById('sidebarUserName').textContent = primerNombre;
+            document.getElementById('sidebarUserCurso').textContent = 'PROFE · ' + (currentUser.materia || '');
+            document.getElementById('userAvatar').textContent = '👨‍🏫';
+
+            // Mostrar nav de profe, ocultar el de estudiante
+            document.querySelector('[data-view="materias"]').classList.add('hidden');
+            document.querySelector('[data-view="resumen"]').classList.add('hidden');
+            document.querySelectorAll('.nav-profe').forEach(n => n.classList.remove('hidden'));
+
+            // Bottom nav profe
+            document.querySelectorAll('.bottom-nav-item').forEach(b => {
+                const v = b.dataset.view;
+                if(v === 'materias' || v === 'resumen') b.classList.add('hidden');
+                if(v === 'guia') { b.querySelector('.bn-icon').textContent = '📝'; b.querySelector('.bn-label').textContent = 'NOTAS'; b.dataset.view = 'profe-notas'; }
+            });
+
+            document.getElementById('profeMateriaTitulo').textContent = currentUser.materia || '';
+            document.getElementById('profeMateriaLabel').textContent = currentUser.materia || '';
+
+            // Listeners del panel profe
+            document.getElementById('profeEstudianteSelect').addEventListener('change', onProfeEstudianteChange);
+            document.getElementById('profePeriodoSelect').addEventListener('change', onProfeEstudianteChange);
+
+            cambiarVista('guia-profe');
+        }
+
+        let profePeriodoActual = 1;
+        let profeEstudianteActual = '';
+        let profeActsMateriaLocal = [];
+        let profeActsLecturaLocal = [];
+        let lecturaPeriodo = 1;
+
+        function mostrarDashboardProfe() {
+            authScreen.classList.add('hidden');
+            dashboard.classList.add('active');
+            document.getElementById('loadingOverlay').classList.add('hidden');
+            document.getElementById('bottomNav').classList.remove('hidden');
+
+            const primerNombre = currentUser.nombre.split(' ')[0];
+            document.getElementById('sidebarUserName').textContent = primerNombre;
+            const rol = currentUser.tipo === 'directora' ? '👩‍💼 DIRECTORA' : '👨‍🏫 PROFE';
+            document.getElementById('sidebarUserCurso').textContent = rol + (currentUser.materia ? ' · ' + currentUser.materia : '');
+            document.getElementById('userAvatar').textContent = currentUser.tipo === 'directora' ? '👩‍💼' : '👨‍🏫';
+
+            // Ocultar nav estudiante, mostrar nav profe
+            document.querySelector('[data-view="materias"]').classList.add('hidden');
+            document.querySelector('[data-view="resumen"]').classList.add('hidden');
+            document.querySelectorAll('.nav-profe').forEach(n => n.classList.remove('hidden'));
+
+            // Si es directora mostrar botón de cerrar
+            if(currentUser.tipo === 'directora') {
+                document.getElementById('directoraBtns').classList.remove('hidden');
+            }
+
+            document.getElementById('profeMateriaTitulo').textContent = currentUser.materia || '';
+            document.getElementById('profeMateriaLabel').textContent = currentUser.materia || '';
+
+            // Listeners selectores profe
+            document.getElementById('profeEstudianteSelect').addEventListener('change', onProfeEstudianteChange);
+            document.querySelectorAll('[data-profe-periodo]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('[data-profe-periodo]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    profePeriodoActual = parseInt(btn.dataset.profePeriodo);
+                    if(profeEstudianteActual) cargarDatosProfe();
+                });
+            });
+            document.querySelectorAll('[data-lectura-periodo]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('[data-lectura-periodo]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    lecturaPeriodo = parseInt(btn.dataset.lecturaPeriodo);
+                    cargarTablaGlobalLectura();
+                });
+            });
+
+            // Notificación: verificar si lectura fue cerrada recientemente
+            verificarNotificacionLectura();
+
+            cambiarVista('guia-profe');
+        }
+
+        async function verificarNotificacionLectura() {
+            const token = localStorage.getItem('notasapp_token');
+            for(let p = 1; p <= 3; p++) {
+                try {
+                    const resp = await fetch(`${API}/lectura/estado/${p}`, { headers: { 'authorization': token } });
+                    if(resp.ok) {
+                        const data = await resp.json();
+                        const key = `lectura_notif_p${p}`;
+                        if(data.cerrado && !localStorage.getItem(key)) {
+                            localStorage.setItem(key, '1');
+                            mostrarNotificacionLectura(p, data.finales);
+                        }
+                    }
+                } catch(e) {}
+            }
+        }
+
+        function mostrarNotificacionLectura(periodo, finales) {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn 0.3s;';
+            const card = document.createElement('div');
+            card.style.cssText = 'background:var(--surface-solid);border:1px solid var(--border-light);border-radius:20px;padding:28px;max-width:480px;width:100%;max-height:80vh;overflow-y:auto;';
+            const filas = finales.map(f => `<tr><td style="padding:7px 8px;font-size:0.75rem;">${f.estudiante_nombre}</td><td style="padding:7px 8px;text-align:center;font-weight:700;color:${f.nota_final>=3?'var(--green)':'var(--red)'}">${f.nota_final}</td></tr>`).join('');
+            card.innerHTML = `
+                <div style="text-align:center;margin-bottom:20px;">
+                    <div style="font-size:2.5rem;margin-bottom:8px;">📖</div>
+                    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:2px;color:var(--accent);">LECTURA PERÍODO ${periodo} FINALIZADA</h2>
+                    <p style="font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted);margin-top:6px;">La directora ha calculado las notas finales de lectura</p>
+                </div>
+                <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
+                    <thead><tr style="border-bottom:1px solid var(--border)"><th style="padding:7px 8px;text-align:left;font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted);">ESTUDIANTE</th><th style="padding:7px 8px;font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted);">NOTA</th></tr></thead>
+                    <tbody>${filas}</tbody>
+                </table>
+                <button onclick="this.closest('div[style*=fixed]').remove()" style="width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;cursor:pointer;">ENTENDIDO</button>
+            `;
+            overlay.appendChild(card);
+            document.body.appendChild(overlay);
+        }
+
+        async function onProfeEstudianteChange() {
+            profeEstudianteActual = document.getElementById('profeEstudianteSelect').value;
+            const panel = document.getElementById('profeNotaPanel');
+            const hint = document.getElementById('profeSelectHint');
+            if(!profeEstudianteActual) { panel.classList.add('hidden'); hint.style.display='block'; return; }
+            panel.classList.remove('hidden');
+            hint.style.display = 'none';
+            await cargarDatosProfe();
+        }
+
+        async function cargarDatosProfe() {
+            const token = localStorage.getItem('notasapp_token');
+            // Cargar actividades de materia (guardadas como materia normal del profe)
+            try {
+                const r = await fetch(`${API}/materias/${profePeriodoActual}`, { headers: { 'authorization': token } });
+                if(r.ok) {
+                    const mats = await r.json();
+                    const mat = mats.find(m => m.nombre === currentUser.materia);
+                    profeActsMateriaLocal = mat?.actividades || [];
+                    renderProfeMateria();
+                }
+            } catch(e) {}
+            // Cargar actividades de lectura de este profe para este estudiante
+            try {
+                const r2 = await fetch(`${API}/lectura/${profePeriodoActual}/${encodeURIComponent(profeEstudianteActual)}`, { headers: { 'authorization': token } });
+                if(r2.ok) { profeActsLecturaLocal = await r2.json(); renderProfeLectura(); }
+            } catch(e) {}
+        }
+
+        function renderProfeMateria() {
+            const cont = document.getElementById('profeMateriaTabla');
+            const prom = document.getElementById('profeMateriaPromedio');
+            if(!profeActsMateriaLocal.length) { cont.innerHTML = '<p style="font-family:Space Mono,monospace;font-size:0.7rem;color:var(--muted);padding:10px 0;">Sin actividades aún</p>'; prom.innerHTML=''; return; }
+            cont.innerHTML = `<table><thead><tr><th>ACTIVIDAD</th><th>NOTA</th><th>FECHA</th><th></th></tr></thead><tbody>
+                ${profeActsMateriaLocal.map((a,i) => `<tr><td>${a.nombre}</td><td style="color:${notaColor(a.nota)};font-weight:700;">${a.nota}</td><td style="color:var(--muted)">${a.fecha||''}</td><td class="act-del" onclick="eliminarActMateria(${i})">✕</td></tr>`).join('')}
+            </tbody></table>`;
+            const avg = profeActsMateriaLocal.reduce((s,a)=>s+a.nota,0)/profeActsMateriaLocal.length;
+            prom.innerHTML = `<span>PROMEDIO:</span><span style="color:${notaColor(avg)};font-weight:700;">${avg.toFixed(2)}</span>`;
+        }
+
+        function renderProfeLectura() {
+            const cont = document.getElementById('profeLeTabla');
+            const prom = document.getElementById('profeLePromedio');
+            const estado = document.getElementById('profeLeFormContainer');
+            if(!profeActsLecturaLocal.length) { cont.innerHTML = '<p style="font-family:Space Mono,monospace;font-size:0.7rem;color:var(--muted);padding:10px 0;">Sin actividades de lectura aún</p>'; prom.innerHTML=''; return; }
+            cont.innerHTML = `<table><thead><tr><th>ACTIVIDAD</th><th>NOTA</th><th>FECHA</th><th>PROFE</th><th></th></tr></thead><tbody>
+                ${profeActsLecturaLocal.map(a => `<tr><td>${a.nombre}</td><td style="color:${notaColor(a.nota)};font-weight:700;">${a.nota}</td><td style="color:var(--muted)">${a.fecha||''}</td><td style="color:var(--muted);font-size:0.65rem;">${a.profe_materia||''}</td><td class="act-del" onclick="eliminarActLectura(${a.id})">${a.profe_id===currentUser?.id?'✕':''}</td></tr>`).join('')}
+            </tbody></table>`;
+            const avg = profeActsLecturaLocal.reduce((s,a)=>s+a.nota,0)/profeActsLecturaLocal.length;
+            prom.innerHTML = `<span>PROMEDIO LECTURA:</span><span style="color:${notaColor(avg)};font-weight:700;">${avg.toFixed(2)}</span>`;
+        }
+
+        async function agregarActividadMateria() {
+            const nombre = document.getElementById('profeMateriaActNombre').value.trim();
+            const nota = parseFloat(document.getElementById('profeMateriaActNota').value);
+            const fecha = document.getElementById('profeMateriaActFecha').value;
+            if(!nombre || isNaN(nota) || nota<0 || nota>5) { showToast('⚠ Completa nombre y nota (0-5)'); return; }
+            profeActsMateriaLocal.push({ nombre, nota, fecha });
+            // Guardar como materia normal del profe
+            const token = localStorage.getItem('notasapp_token');
+            const r = await fetch(`${API}/materias/${profePeriodoActual}`, { headers:{'authorization':token} });
+            let mats = r.ok ? await r.json() : [];
+            let mat = mats.find(m => m.nombre === currentUser.materia);
+            if(!mat) { mat = { nombre: currentUser.materia, actividades:[], autoevaluacion:[], trimestral:[], extras:[], puntosNegativos:[] }; mats.push(mat); }
+            mat.actividades = profeActsMateriaLocal;
+            await fetch(`${API}/materias/save`, { method:'POST', headers:{'Content-Type':'application/json','authorization':token}, body: JSON.stringify({ periodo: profePeriodoActual, materiasArray: mats }) });
+            document.getElementById('profeMateriaActNombre').value = '';
+            document.getElementById('profeMateriaActNota').value = '';
+            renderProfeMateria();
+            showToast('✅ Actividad guardada');
+        }
+
+        async function eliminarActMateria(idx) {
+            profeActsMateriaLocal.splice(idx, 1);
+            const token = localStorage.getItem('notasapp_token');
+            const r = await fetch(`${API}/materias/${profePeriodoActual}`, { headers:{'authorization':token} });
+            let mats = r.ok ? await r.json() : [];
+            let mat = mats.find(m => m.nombre === currentUser.materia);
+            if(mat) { mat.actividades = profeActsMateriaLocal; await fetch(`${API}/materias/save`, { method:'POST', headers:{'Content-Type':'application/json','authorization':token}, body: JSON.stringify({ periodo: profePeriodoActual, materiasArray: mats }) }); }
+            renderProfeMateria();
+        }
+
+        async function agregarActividadLectura() {
+            const nombre = document.getElementById('profeLeActNombre').value.trim();
+            const nota = parseFloat(document.getElementById('profeLeActNota').value);
+            const fecha = document.getElementById('profeLeActFecha').value;
+            if(!nombre || isNaN(nota) || nota<0 || nota>5) { showToast('⚠ Completa nombre y nota (0-5)'); return; }
+            const token = localStorage.getItem('notasapp_token');
+            try {
+                const resp = await fetch(`${API}/lectura/actividad`, { method:'POST', headers:{'Content-Type':'application/json','authorization':token}, body: JSON.stringify({ estudiante: profeEstudianteActual, periodo: profePeriodoActual, nombre, nota, fecha }) });
+                if(resp.ok) {
+                    document.getElementById('profeLeActNombre').value='';
+                    document.getElementById('profeLeActNota').value='';
+                    const r2 = await fetch(`${API}/lectura/${profePeriodoActual}/${encodeURIComponent(profeEstudianteActual)}`, { headers:{'authorization':token} });
+                    if(r2.ok) { profeActsLecturaLocal = await r2.json(); renderProfeLectura(); }
+                    showToast('✅ Actividad de lectura guardada');
+                } else { const d = await resp.json(); showToast('⚠ ' + d.error); }
+            } catch(e) { showToast('⚠ Error de conexión'); }
+        }
+
+        async function eliminarActLectura(id) {
+            const token = localStorage.getItem('notasapp_token');
+            try {
+                const resp = await fetch(`${API}/lectura/actividad/${id}`, { method:'DELETE', headers:{'authorization':token} });
+                if(resp.ok) {
+                    const r2 = await fetch(`${API}/lectura/${profePeriodoActual}/${encodeURIComponent(profeEstudianteActual)}`, { headers:{'authorization':token} });
+                    if(r2.ok) { profeActsLecturaLocal = await r2.json(); renderProfeLectura(); }
+                }
+            } catch(e) {}
+        }
+
+        async function cargarTablaGlobalLectura() {
+            const token = localStorage.getItem('notasapp_token');
+            const cont = document.getElementById('lecturaGlobalTabla');
+            const banner = document.getElementById('lecturaEstadoBanner');
+            cont.innerHTML = '<p style="font-family:Space Mono,monospace;font-size:0.7rem;color:var(--muted);padding:20px 0;text-align:center;">Cargando...</p>';
+            try {
+                const [r1, r2] = await Promise.all([
+                    fetch(`${API}/lectura/${lecturaPeriodo}`, { headers:{'authorization':token} }),
+                    fetch(`${API}/lectura/estado/${lecturaPeriodo}`, { headers:{'authorization':token} })
+                ]);
+                const data = r1.ok ? await r1.json() : {};
+                const estado = r2.ok ? await r2.json() : { cerrado: 0 };
+
+                if(estado.cerrado) {
+                    banner.style.display='flex';
+                    banner.innerHTML=`✅ Período ${lecturaPeriodo} cerrado. Notas finales calculadas.`;
+                } else { banner.style.display='none'; }
+
+                const estudiantes = ['ASCENCIO GALLEGO HEIDY VALENTINA','CHAPARRO VILLEGAS JOHAN SEBASTIAN','COMBARIZA CASTRO DUVAN FELIPE','DURAN GRANADOS MICHAEL STIV','GARCIA CASTAÑO JHOJAN SANTIAGO','GUERRERO ARENAS MARIANA','MARTIN QUINTERO NICOLLE VALERIA','MORENO CIFUENTES MICHAEL STICK','ORTIZ GONZALEZ SHAYRA VALENTINA','ALVAREZ CULMA DAVID SANTIAGO','PEÑARETE CAMACHO ANDRES SANTIAGO','RAMIREZ GARCIA MICHELLE TATIANA','RAMIREZ JIMENEZ JULIAN SANTIAGO','RAMIREZ MARTINEZ WENDY DALLANA','RODRIGUEZ BOHORQUEZ DEINER ANDREY','ROJAS GARCIA RAYHAN MATTEO','RUIZ SOLORZANO SOFIA ALEXA','SALAZAR TOCUA MELANY SOFIA','VARGAS VARGAS DILAN CAMILO'];
+
+                if(!Object.keys(data).length) { cont.innerHTML='<div class="empty-state"><span class="empty-icon">📖</span><p>Sin actividades de lectura aún</p></div>'; return; }
+
+                let html = '';
+                estudiantes.forEach((est, idx) => {
+                    const acts = data[est] || [];
+                    if(!acts.length) return;
+                    const avg = acts.reduce((s,a)=>s+a.nota,0)/acts.length;
+                    const final = estado.finales?.find(f=>f.estudiante_nombre===est);
+                    html += `<div class="resumen-item" style="margin-bottom:12px;padding:14px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                            <span style="font-family:'Space Mono',monospace;font-size:0.7rem;font-weight:700;">${idx+1}. ${est}</span>
+                            ${final ? `<span class="calif-badge ${notaClase(final.nota_final)}" style="font-size:0.8rem;">FINAL: ${final.nota_final}</span>` : `<span style="font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--muted);">PROM: ${avg.toFixed(2)}</span>`}
+                        </div>
+                        <table style="width:100%"><thead><tr><th>ACTIVIDAD</th><th>NOTA</th><th>MATERIA</th></tr></thead><tbody>
+                        ${acts.map(a=>`<tr><td>${a.nombre}</td><td style="color:${notaColor(a.nota)};font-weight:700;">${a.nota}</td><td style="color:var(--muted);font-size:0.65rem;">${a.profe_materia||''}</td></tr>`).join('')}
+                        </tbody></table>
+                    </div>`;
+                });
+                cont.innerHTML = html || '<div class="empty-state"><span class="empty-icon">📖</span><p>Sin actividades registradas</p></div>';
+            } catch(e) { cont.innerHTML='<p style="color:var(--red);font-family:Space Mono,monospace;font-size:0.75rem;">Error cargando datos</p>'; }
+        }
+
+        async function cerrarPeriodoLectura() {
+            if(!confirm(`¿Cerrar el período ${lecturaPeriodo} de lectura? Esto calculará las notas finales y notificará a todos los profesores.`)) return;
+            const token = localStorage.getItem('notasapp_token');
+            try {
+                const resp = await fetch(`${API}/lectura/cerrar/${lecturaPeriodo}`, { method:'POST', headers:{'authorization':token} });
+                if(resp.ok) {
+                    showToast('✅ Período cerrado. Notas calculadas.');
+                    localStorage.removeItem(`lectura_notif_p${lecturaPeriodo}`);
+                    cargarTablaGlobalLectura();
+                } else { const d = await resp.json(); showToast('⚠ '+d.error); }
+            } catch(e) { showToast('⚠ Error de conexión'); }
+        }
+
+        function cambiarVista(view) {
+            currentView = view;
+            document.querySelectorAll('.view').forEach(v => {
+                v.classList.remove('active');
+                v.style.animation = 'none';
+                v.offsetHeight;
+                v.style.animation = null;
+            });
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.querySelectorAll('.bottom-nav-item').forEach(n => {
+                n.classList.toggle('active', n.dataset.view === view);
+            });
+
+            const viewMap = {
+                'materias': 'viewMaterias',
+                'resumen': 'viewResumen',
+                'guia': 'viewGuia',
+                'creditos': 'viewCreditos',
+                'soporte': 'viewSoporte',
+                'profe-notas': 'viewProfeNotas',
+                'lectura-global': 'viewLecturaGlobal',
+                'guia-profe': 'viewGuiaProfe'
+            };
+            if(viewMap[view]) document.getElementById(viewMap[view]).classList.add('active');
+
+            const navItem = document.querySelector(`.nav-item[data-view="${view}"]`);
+            if(navItem) navItem.classList.add('active');
+
+            const titles = {
+                'materias': 'Mis Materias',
+                'resumen': 'Resumen del Período',
+                'guia': 'Guía de Uso',
+                'creditos': 'Créditos',
+                'soporte': 'Soporte y Reportes',
+                'profe-notas': 'Poner Notas',
+                'lectura-global': 'Tabla Global de Lectura',
+                'guia-profe': 'Guía del Profesor'
+            };
+            document.getElementById('topbarTitle').textContent = titles[view] || view;
+
+            if(view === 'resumen') renderResumen();
+            if(view === 'lectura-global') cargarTablaGlobalLectura();
+            sidebar.classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+        }
+
+        function render() {
+            if(!currentUser) return;
+            const materias = getMaterias();
+            if(!materias.length) {
+                cardsGrid.innerHTML = '';
+                emptyMaterias.classList.remove('hidden');
+            } else {
+                emptyMaterias.classList.add('hidden');
+                // Aquí aplicamos el Staggered Animation (retraso en línea)
+                cardsGrid.innerHTML = materias.map((m, i) => renderCard(m, i, i * 0.08)).join('');
+            }
+            if(currentView==='resumen') renderResumen();
+        }
+
+        function renderCard(m, idx, delayStr) {
+            const calif = getCalif(m.notaFinal);
+            const cf = m.notaFinal !== null ? getColor(m.notaFinal) : '';
+            const filas = m.actividades.map((a, ai) => `
+                <tr><td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(a.nombre)}">${esc(a.nombre)}</td><td style="color:var(--muted)">${a.fecha||'—'}</td><td style="color:${getColor(a.nota)};font-weight:700;text-align:center;">${a.nota.toFixed(1)}</td><td class="act-del" onclick="eliminarActividad(${idx},${ai})" title="Eliminar actividad">✕</td></tr>
+            `).join('');
+            const promBase = m.actividades.length ? m.actividades.reduce((s,a)=>s+a.nota,0)/m.actividades.length : null;
+            const totExtra = m.puntosExtra.reduce((s,e)=>s+e.puntos,0);
+            const totNeg = m.puntosNegativos.reduce((s,n)=>s+n.puntos,0);
+            let promAjustado = promBase !== null ? Math.min(5, Math.max(0, promBase - totNeg) + totExtra) : null;
+            
+            const extrasHtml = m.puntosExtra.map((e,ei) => `
+                <div class="extra-item"><span class="extra-nombre">${esc(e.nombre)}</span><span class="extra-pts">+${e.puntos}</span><span class="extra-del" onclick="eliminarExtra(${idx},${ei})">✕</span></div>
+            `).join('');
+            const negHtml = m.puntosNegativos.map((n,ni) => `
+                <div class="negativo-item"><span class="negativo-nombre">${esc(n.nombre)}</span><span class="negativo-pts">−${n.puntos}</span><span class="negativo-del" onclick="eliminarNegativo(${idx},${ni})">✕</span></div>
+            `).join('');
+            
+            return `
+            <div class="materia-card" style="animation-delay: ${delayStr}s">
+                <div class="card-header"><span class="materia-nombre">${m.nombre}</span><button class="btn-icon" onclick="eliminarMateria(${idx})" title="Eliminar materia">✕</button></div>
+                <div class="card-body">
+                    <div class="nota-label">ACTIVIDADES / PROMEDIO <span class="pct-badge">60%</span></div>
+                    ${m.actividades.length ? `<table><thead><tr><th>ACTIVIDAD</th><th>FECHA</th><th style="text-align:center;">NOTA</th><th></th></tr></thead><tbody>${filas}</tbody></table>` : '<div style="font-size:0.75rem;color:var(--muted);padding:8px 0;text-align:center;background:rgba(0,0,0,0.1);border-radius:6px;margin-bottom:8px;">Aún no hay actividades registradas</div>'}
+                    <div class="add-act-form">
+                        <input class="act-input" id="act-nom-${idx}" placeholder="Nombre actividad">
+                        <input class="nota-input-sm" id="act-nota-${idx}" type="number" min="0" max="5" step="0.1" placeholder="0-5">
+                        <input class="date-input" id="act-fecha-${idx}" type="date">
+                        <button class="btn-add-nota" onclick="agregarActividad(${idx})" title="Agregar Actividad">+</button>
+                    </div>
+                    ${promBase!==null?`<div class="prom-display">Promedio base: <b style="color:var(--text)">${promBase.toFixed(2)}</b> ${totExtra||totNeg?`<span style="color:var(--muted)">→</span> Ajustado: <b style="color:var(--accent)">${promAjustado.toFixed(2)}</b>`:''}${m.promedioFinal!==null?` <span style="color:var(--muted)">|</span> Aporte 60%: <b style="color:var(--green);font-size:0.85rem;">${m.promedioFinal.toFixed(2)}</b>`:''}</div>`:''}
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="nota-label" style="color:var(--orange)">PUNTOS EXTRA <span class="pct-badge" style="color:var(--orange); border-color: rgba(251,146,60,0.3); background: rgba(251,146,60,0.1);">+ SUMAN</span></div>
+                    ${m.puntosExtra.length?`<div>${extrasHtml}</div>`:''}
+                    <div class="add-extra-form">
+                        <input class="act-input" id="ext-nom-${idx}" placeholder="Descripción">
+                        <input class="nota-input-sm" id="ext-pts-${idx}" type="number" min="0" step="0.01" placeholder="pts">
+                        <button class="btn-add-nota" style="background:rgba(251,146,60,0.1);color:var(--orange);border-color:rgba(251,146,60,0.3);" onclick="agregarExtra(${idx})">+</button>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="nota-label" style="color:var(--red)">PUNTOS NEGATIVOS <span class="pct-badge" style="color:var(--red); border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.1);">- RESTAN</span></div>
+                    ${m.puntosNegativos.length?`<div>${negHtml}</div>`:''}
+                    <div class="add-negativo-form">
+                        <input class="act-input" id="neg-nom-${idx}" placeholder="Motivo">
+                        <input class="nota-input-sm" id="neg-pts-${idx}" type="number" min="0" step="0.01" placeholder="pts">
+                        <button class="btn-add-negativo" onclick="agregarNegativo(${idx})">−</button>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="nota-label">AUTOEVALUACIÓN <span class="pct-badge">10%</span></div>
+                    <div style="display:flex;gap:12px;align-items:center;"><input class="nota-input-sm" id="auto-${idx}" type="number" min="0" max="5" step="0.1" value="${m.autoevaluacion??''}" onchange="setSingle(${idx},'autoevaluacion',this.value)">${m.autoevaluacion!==null?`<span style="font-family:'Space Mono';font-size:0.8rem;color:var(--text2);">= ${(m.autoevaluacion*0.1).toFixed(2)}</span>`:''}</div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="nota-label">TRIMESTRAL <span class="pct-badge">20%</span></div>
+                    <div style="display:flex;gap:12px;align-items:center;"><input class="nota-input-sm" id="trim-${idx}" type="number" min="0" max="5" step="0.1" value="${m.trimestral??''}" onchange="setSingle(${idx},'trimestral',this.value)">${m.trimestral!==null?`<span style="font-family:'Space Mono';font-size:0.8rem;color:var(--text2);">= ${(m.trimestral*0.2).toFixed(2)}</span>`:''}</div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="nota-label">LECTURA CRÍTICA <span class="pct-badge">10%</span></div>
+                    <div style="display:flex;gap:12px;align-items:center;"><input class="nota-input-sm" id="lect-${idx}" type="number" min="0" max="5" step="0.1" value="${m.lectura??''}" onchange="setSingle(${idx},'lectura',this.value)">${m.lectura!==null?`<span style="font-family:'Space Mono';font-size:0.8rem;color:var(--text2);">= ${(m.lectura*0.1).toFixed(2)}</span>`:''}</div>
+                    
+                    ${m.notaFinal!==null?`
+                    <div class="nota-final-grande">
+                        <span>NOTA DEL TRIMESTRE</span>
+                        <div style="display:flex;align-items:center;gap:12px">
+                            <span class="calif-badge ${calif.cls}">${calif.label}</span>
+                            <span class="nota-final-num" style="color:${cf}">${m.notaFinal.toFixed(2)}</span>
+                        </div>
+                    </div>`:''}
+                </div>
+                <div class="card-footer">
+                    <button class="btn-finalizar btn-calc-promedio" onclick="finalizarPromedio(${idx})">✓ FINALIZAR MATERIA</button>
+                    <button class="btn-finalizar btn-calc-final" onclick="calcularFinal(${idx})">▶ CALCULAR TRIMESTRE</button>
+                </div>
+            </div>`;
+        }
+
+        function getColor(nota) { return nota===null?'var(--muted)':nota<=1?'var(--red)':nota<=2.9?'var(--yellow)':nota<=3.9?'var(--accent)':'var(--green)'; }
+        function getCalif(nota) { return nota===null||nota===undefined?{label:'—',cls:''}:nota<=1?{label:'DEFICIENTE',cls:'calif-deficiente'}:nota<=2.9?{label:'MALO',cls:'calif-malo'}:nota<=3.9?{label:'ACEPTABLE',cls:'calif-aceptable'}:{label:'SOBRESALIENTE',cls:'calif-sobresaliente'}; }
+
+        function agregarActividad(idx) {
+            const nom = document.getElementById(`act-nom-${idx}`).value.trim();
+            const nota = parseFloat(document.getElementById(`act-nota-${idx}`).value);
+            const fecha = document.getElementById(`act-fecha-${idx}`).value;
+            if(!nom||isNaN(nota)||nota<0||nota>5) { showToast('⚠ Completa nombre y nota (0-5)'); return; }
+            getMaterias()[idx].actividades.push({ nombre: nom, fecha: fecha ? fecha.split('-').reverse().join('/').slice(0,8) : '', nota: Math.round(nota*100)/100 });
+            getMaterias()[idx].promedioFinal = null;
+            guardarDatos(); render();
+            showToast('✅ Actividad agregada');
+        }
+
+        function eliminarActividad(idx, ai) { getMaterias()[idx].actividades.splice(ai,1); getMaterias()[idx].promedioFinal=null; guardarDatos(); render(); }
+        
+        function agregarExtra(idx) {
+            const nom = document.getElementById(`ext-nom-${idx}`).value.trim();
+            const pts = parseFloat(document.getElementById(`ext-pts-${idx}`).value);
+            if(!nom||isNaN(pts)||pts<=0) { showToast('⚠ Revisa los puntos extra'); return; }
+            getMaterias()[idx].puntosExtra.push({nombre:nom, puntos: Math.round(pts*1000)/1000});
+            getMaterias()[idx].promedioFinal=null; guardarDatos(); render();
+        }
+        function eliminarExtra(idx, ei) { getMaterias()[idx].puntosExtra.splice(ei,1); getMaterias()[idx].promedioFinal=null; guardarDatos(); render(); }
+        
+        function agregarNegativo(idx) {
+            const nom = document.getElementById(`neg-nom-${idx}`).value.trim();
+            const pts = parseFloat(document.getElementById(`neg-pts-${idx}`).value);
+            if(!nom||isNaN(pts)||pts<=0) { showToast('⚠ Revisa los puntos negativos'); return; }
+            getMaterias()[idx].puntosNegativos.push({nombre:nom, puntos: Math.round(pts*1000)/1000});
+            getMaterias()[idx].promedioFinal=null; guardarDatos(); render();
+        }
+        function eliminarNegativo(idx, ni) { getMaterias()[idx].puntosNegativos.splice(ni,1); getMaterias()[idx].promedioFinal=null; guardarDatos(); render(); }
+        
+        function setSingle(idx, campo, val) {
+            const v = parseFloat(val);
+            getMaterias()[idx][campo] = (isNaN(v)||v<0||v>5) ? null : Math.round(v*100)/100;
+            getMaterias()[idx].notaFinal = null; guardarDatos(); render();
+        }
+        
+        function finalizarPromedio(idx) {
+            const m = getMaterias()[idx];
+            if(!m.actividades.length) { showToast('⚠ Agrega al menos una actividad primero'); return; }
+            const base = m.actividades.reduce((s,a)=>s+a.nota,0)/m.actividades.length;
+            const extra = m.puntosExtra.reduce((s,e)=>s+e.puntos,0);
+            const neg = m.puntosNegativos.reduce((s,n)=>s+n.puntos,0);
+            const ajustado = Math.min(5, Math.max(0, base - neg) + extra);
+            m.promedioFinal = Math.round(ajustado * 0.6 * 10000) / 10000;
+            guardarDatos(); render();
+            showToast('✅ Materia finalizada');
+        }
+        
+        function calcularFinal(idx) {
+            const m = getMaterias()[idx];
+            if(m.promedioFinal===null) { showToast('⚠ Primero "Finalizar Materia" (calcula el 60%)'); return; }
+            if(m.autoevaluacion===null||m.trimestral===null||m.lectura===null) { showToast('⚠ Faltan notas (Auto, Trimestral o Lectura)'); return; }
+            const total = m.promedioFinal + m.autoevaluacion*0.1 + m.trimestral*0.2 + m.lectura*0.1;
+            m.notaFinal = Math.round(total*100)/100;
+            m.calificacion = getCalif(m.notaFinal).label;
+            guardarDatos(); render();
+            showToast('🏆 Nota trimestral calculada');
+        }
+        
+        function eliminarMateria(idx) { if(confirm('¿Estás seguro de eliminar esta materia y todas sus notas?')) { getMaterias().splice(idx,1); guardarDatos(); render(); showToast('🗑️ Materia eliminada'); } }
+        
+        function renderResumen() {
+            const materias = getMaterias().filter(m=>m.notaFinal!==null);
+            if(!materias.length) { resumenGrid.innerHTML=''; emptyResumen.classList.remove('hidden'); return; }
+            emptyResumen.classList.add('hidden');
+            resumenGrid.innerHTML = materias.map((m, i) => `
+                <div class="resumen-item" style="animation: slideInUp 0.4s ease backwards; animation-delay: ${i * 0.05}s">
+                    <span class="resumen-materia">${m.nombre}</span>
+                    <span class="resumen-nota" style="color:${getColor(m.notaFinal)}">${m.notaFinal.toFixed(2)}</span>
+                </div>
+            `).join('');
+        }
+        
+        function abrirModal() { document.getElementById('modalMateria').classList.add('open'); setTimeout(()=>document.getElementById('modalInput').focus(), 100); }
+        function cerrarModal() { document.getElementById('modalMateria').classList.remove('open'); document.getElementById('modalInput').value=''; }
+        
+        function agregarMateria() {
+            const nombre = document.getElementById('modalInput').value.trim().toUpperCase();
+            if(!nombre) { showToast('⚠ Escribe el nombre de la materia'); return; }
+            if(getMaterias().find(m=>m.nombre===nombre)) { showToast('⚠ Esa materia ya existe'); return; }
+            getMaterias().push(crearMateria(nombre));
+            guardarDatos(); cerrarModal(); render();
+            showToast('📚 Nueva materia agregada');
+        }
+        
+        function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        
+        let toastTimer;
+        function showToast(msg) { 
+            toast.textContent=msg; 
+            toast.classList.add('show'); 
+            clearTimeout(toastTimer); 
+            toastTimer=setTimeout(()=>toast.classList.remove('show'),3500); 
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            init();
+
+            // Sidebar overlay móvil
+            const overlay = document.getElementById('sidebarOverlay');
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            });
+
+            // Bottom nav móvil
+            document.querySelectorAll('.bottom-nav-item').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.bottom-nav-item').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    cambiarVista(btn.dataset.view);
+                });
+            });
+        });
+    </script>
 </body>
 </html>
